@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#070707">
+<meta name="color-scheme" content="dark">
+<title>MrFeastProjectBank</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#070707;
+  --gold:#d4af37;
+  --gold-light:#f5d77a;
+  --gold-deep:#9c7c2e;
+  --text:#f3ead2;
+  --muted:#8a8270;
+  --green:#5fcf80;
+  --red:#ff6868;
+  --card-w:min(92vw,460px);
+  --card-h:calc(var(--card-w)*.63);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  min-height:100%;
+  transform:translateZ(0);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(212,175,55,.10),transparent 60%),
+    radial-gradient(900px 500px at -10% 110%,rgba(212,175,55,.07),transparent 55%),
+    var(--bg);
+  color:var(--text);
+  min-height:100dvh;
+  overflow-x:hidden;
+  padding-bottom:calc(24px + var(--safe-b));
+}
+
+button,input,textarea{
+  font:inherit;
+}
+
+button{
+  color:inherit;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* ================= AUTH ================= */
+
+.auth-screen{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:
+    radial-gradient(700px 500px at 50% 0%,rgba(212,175,55,.12),transparent 65%),
+    #050505;
+  transform:translateZ(0);
+}
+
+.auth-box{
+  width:min(100%,430px);
+  padding:32px 26px 28px;
+  border:1px solid rgba(212,175,55,.20);
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(25,25,25,.96),rgba(8,8,8,.96));
+  box-shadow:
+    0 35px 100px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  text-align:center;
+  animation:authIn .45s cubic-bezier(.2,.8,.2,1);
+  will-change:transform,opacity;
+  transform:translateZ(0);
+}
+
+@keyframes authIn{
+  from{opacity:0;transform:translateY(16px) scale(.98)}
+  to{opacity:1;transform:none}
+}
+
+.auth-logo{
+  width:82px;
+  height:82px;
+  margin:auto;
+  display:block;
+  filter:drop-shadow(0 0 22px rgba(212,175,55,.20));
+}
+
+.auth-title{
+  margin-top:16px;
+  font-size:25px;
+  font-weight:800;
+  background:linear-gradient(180deg,var(--gold-light),var(--gold),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.auth-subtitle{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.auth-step{
+  margin-top:25px;
+  text-align:left;
+}
+
+.field-label{
+  display:block;
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+}
+
+.input{
+  width:100%;
+  border:1px solid rgba(212,175,55,.18);
+  outline:none;
+  border-radius:14px;
+  padding:14px 15px;
+  background:rgba(255,255,255,.035);
+  color:var(--text);
+  transition:border-color .18s,box-shadow .18s;
+}
+
+.input:focus{
+  border-color:rgba(212,175,55,.65);
+  box-shadow:0 0 0 3px rgba(212,175,55,.08);
+}
+
+.input::placeholder{
+  color:#5d584c;
+}
+
+.auth-btn,
+.gold-btn{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+  cursor:pointer;
+  font-weight:700;
+  color:#171207;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-deep));
+  box-shadow:0 10px 25px rgba(212,175,55,.14);
+  transition:filter .18s,transform .18s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  transform:translateZ(0);
+}
+
+.auth-btn:hover,
+.gold-btn:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px) translateZ(0);
+}
+
+.auth-btn:active,
+.gold-btn:active{
+  transform:scale(.98) translateZ(0);
+}
+
+.auth-btn:disabled{
+  opacity:.5;
+  cursor:wait;
+}
+
+.pin-display-box{
+  background:rgba(212,175,55,.07);
+  border:1px solid rgba(212,175,55,.25);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:18px;
+  text-align:center;
+}
+
+.pin-display-value{
+  font-family:monospace;
+  font-size:32px;
+  font-weight:800;
+  letter-spacing:8px;
+  color:var(--gold-light);
+  margin:10px 0;
+  padding:10px;
+  background:rgba(0,0,0,.45);
+  border-radius:12px;
+  border:1px dashed rgba(212,175,55,.45);
+  user-select:all;
+}
+
+.secondary-btn{
+  width:100%;
+  border:1px solid rgba(212,175,55,.20);
+  border-radius:14px;
+  padding:13px;
+  margin-top:10px;
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+  font-weight:600;
+  transition:background .18s;
+}
+
+.secondary-btn:hover{
+  background:rgba(255,255,255,.07);
+}
+
+.danger-btn{
+  width:100%;
+  border:1px solid rgba(255,104,104,.35);
+  border-radius:14px;
+  padding:12px;
+  margin-top:12px;
+  background:rgba(255,104,104,.10);
+  color:var(--red);
+  cursor:pointer;
+  font-weight:700;
+  transition:background .18s;
+}
+
+.danger-btn:hover{
+  background:rgba(255,104,104,.2);
+}
+
+.auth-message{
+  min-height:20px;
+  margin-top:13px;
+  font-size:12px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.auth-message.error{
+  color:var(--red);
+}
+
+.auth-message.success{
+  color:var(--green);
+}
+
+.otp{
+  text-align:center;
+  letter-spacing:9px;
+  font-size:24px;
+  font-weight:700;
+}
+
+/* AVATAR SELECTOR & UPLOAD */
+.avatar-section{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin:14px 0 20px;
+  gap:10px;
+}
+
+.avatar-preview{
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  object-fit:cover;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  color:#171207;
+  font-size:32px;
+  font-weight:800;
+  background:linear-gradient(145deg,var(--gold-light),var(--gold-deep));
+  border:3px solid rgba(212,175,55,.5);
+  box-shadow:0 8px 24px rgba(0,0,0,.6);
+  overflow:hidden;
+  position:relative;
+  transition:transform .18s,border-color .18s;
+}
+
+.avatar-preview:hover{
+  border-color:var(--gold-light);
+  transform:scale(1.02);
+}
+
+.avatar-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.avatar-upload-actions{
+  display:flex;
+  gap:8px;
+}
+
+.upload-photo-btn{
+  border:1px solid rgba(212,175,55,.3);
+  background:rgba(212,175,55,.1);
+  color:var(--gold-light);
+  padding:7px 14px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition:background .18s;
+}
+
+.upload-photo-btn:hover{
+  background:rgba(212,175,55,.2);
+}
+
+.avatar-presets{
+  display:flex;
+  gap:8px;
+  margin-top:4px;
+}
+
+.preset-chip{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05);
+  display:grid;
+  place-items:center;
+  font-size:16px;
+  cursor:pointer;
+  transition:transform .15s,border-color .15s;
+}
+
+.preset-chip:hover{
+  border-color:var(--gold);
+  transform:scale(1.1);
+}
+
+/* ================= WELCOME ================= */
+
+.welcome-screen{
+  position:fixed;
+  inset:0;
+  z-index:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:
+    radial-gradient(700px 500px at 50% 30%,rgba(212,175,55,.13),transparent 65%),
+    #050505;
+  animation:welcomeIn .4s ease;
+  transform:translateZ(0);
+}
+
+@keyframes welcomeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.welcome-inner{
+  padding:30px;
+}
+
+.welcome-logo{
+  width:105px;
+  height:105px;
+  filter:drop-shadow(0 0 30px rgba(212,175,55,.25));
+  animation:logoPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes logoPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.035)}
+}
+
+.welcome-bank{
+  margin-top:20px;
+  font-size:24px;
+  font-weight:800;
+  background:linear-gradient(180deg,var(--gold-light),var(--gold),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.welcome-greeting{
+  margin-top:12px;
+  font-size:17px;
+  color:var(--text);
+}
+
+.welcome-name{
+  margin-top:7px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* ================= APP ================= */
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px clamp(16px,5vw,40px);
+  position:sticky;
+  top:0;
+  z-index:20;
+  backdrop-filter:blur(8px);
+  background:linear-gradient(to bottom,rgba(7,7,7,.9),rgba(7,7,7,0));
+  transform:translateZ(0);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+}
+
+.brand .logo{
+  width:30px;
+  height:30px;
+}
+
+.brand span{
+  font-size:15px;
+  background:linear-gradient(180deg,var(--gold-light),var(--gold),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.status-badge{
+  font-size:11px;
+  padding:4px 9px;
+  border-radius:20px;
+  background:rgba(95,207,128,.12);
+  border:1px solid rgba(95,207,128,.3);
+  color:var(--green);
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.status-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+}
+
+.avatar{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  font-weight:700;
+  font-size:14px;
+  color:#1a1407;
+  background:linear-gradient(145deg,var(--gold-light),var(--gold-deep));
+  box-shadow:
+    0 0 0 1px rgba(212,175,55,.4),
+    0 4px 14px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:transform .18s,box-shadow .18s;
+  transform:translateZ(0);
+}
+
+.avatar:hover{
+  transform:scale(1.05) translateZ(0);
+  box-shadow:0 0 0 2px var(--gold-light);
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:8px clamp(16px,5vw,40px) 0;
+  gap:26px;
+  transform:translateZ(0);
+}
+
+.balance{
+  text-align:center;
+  user-select:none;
+}
+
+.balance .label{
+  font-size:12px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+
+.balance .amount{
+  display:inline-flex;
+  align-items:baseline;
+  justify-content:center;
+  font-size:clamp(34px,9vw,52px);
+  font-weight:700;
+  line-height:1;
+  background:linear-gradient(180deg,#fff 0%,var(--gold-light) 45%,var(--gold) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.balance .amount .cur{
+  font-size:.62em;
+  font-weight:700;
+  margin-right:.14em;
+  background:none;
+  -webkit-text-fill-color:var(--gold);
+  color:var(--gold);
+}
+
+.balance .delta{
+  margin-top:12px;
+  font-size:13px;
+  color:var(--green);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.card-scene{
+  width:var(--card-w);
+  height:var(--card-h);
+  perspective:1600px;
+  cursor:pointer;
+  transform:translateZ(0);
+}
+
+.card{
+  position:relative;
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  transition:transform .7s cubic-bezier(.2,.8,.2,1);
+  will-change:transform;
+  transform:translateZ(0);
+}
+
+.card.flipped{
+  transform:rotateY(180deg) translateZ(0);
+}
+
+.face{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  border-radius:22px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#161616 0%,#0a0a0a 45%,#050505 100%);
+  box-shadow:
+    0 30px 60px -20px rgba(0,0,0,.8),
+    0 0 0 1px rgba(212,175,55,.25),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.face::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.06),transparent 40%);
+  pointer-events:none;
+}
+
+.ribbon{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.front{
+  padding:clamp(18px,5vw,26px);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.front .row-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.front .row-top .logo{
+  width:34px;
+  height:34px;
+}
+
+.front .bank-name{
+  font-size:clamp(15px,4.4vw,20px);
+  font-weight:700;
+  background:linear-gradient(180deg,var(--gold-light),var(--gold),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.chip{
+  width:clamp(40px,11vw,52px);
+  height:clamp(30px,8vw,40px);
+  border-radius:7px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold) 50%,var(--gold-deep));
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.5);
+  position:relative;
+  margin-top:6px;
+}
+
+.chip::after{
+  content:"";
+  position:absolute;
+  inset:18% 22%;
+  border:1px solid rgba(0,0,0,.35);
+  border-radius:3px;
+  background:
+    linear-gradient(to right,transparent 48%,rgba(0,0,0,.3) 48% 52%,transparent 52%),
+    linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.25) 30% 32%,transparent 32% 64%,rgba(0,0,0,.25) 64% 66%,transparent 66%);
+}
+
+.number{
+  font-size:clamp(17px,5vw,23px);
+  letter-spacing:3px;
+  font-weight:600;
+  color:var(--text);
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+  font-variant-numeric:tabular-nums;
+}
+
+.front .row-bot{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.meta .k{
+  font-size:9px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:3px;
+}
+
+.meta .v{
+  font-size:clamp(12px,3.6vw,15px);
+  font-weight:600;
+  color:var(--text);
+}
+
+.network{
+  font-weight:800;
+  font-style:italic;
+  font-size:clamp(15px,4vw,19px);
+  background:linear-gradient(180deg,var(--gold-light),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.back{
+  transform:rotateY(180deg);
+  padding:clamp(18px,5vw,26px);
+  display:flex;
+  flex-direction:column;
+}
+
+.back .bank-name-tr{
+  align-self:flex-end;
+  font-size:clamp(13px,3.6vw,16px);
+  font-weight:700;
+  background:linear-gradient(180deg,var(--gold-light),var(--gold-deep));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.strip{
+  height:clamp(34px,9vw,46px);
+  margin-top:14px;
+  background:linear-gradient(180deg,#1c1c1c,#000);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.sign-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:22px;
+}
+
+.sign-box{
+  flex:1;
+  height:clamp(40px,11vw,52px);
+  border-radius:6px;
+  background:repeating-linear-gradient(
+    115deg,
+    rgba(212,175,55,.18) 0 6px,
+    rgba(212,175,55,.06) 6px 12px
+  );
+  box-shadow:inset 0 0 0 1px rgba(212,175,55,.3);
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding-right:12px;
+  font-style:italic;
+  font-weight:600;
+  color:var(--gold-light);
+  font-size:14px;
+}
+
+.sign-label{
+  font-size:9px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.not-valid{
+  font-size:9px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--muted);
+  line-height:1.5;
+  max-width:90px;
+}
+
+.contactless{
+  width:clamp(26px,7vw,34px);
+  opacity:.85;
+}
+
+.back .bottom{
+  margin-top:auto;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+}
+
+.slogan{
+  font-size:clamp(11px,3vw,13px);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--gold);
+  line-height:1.7;
+  font-weight:600;
+}
+
+.back .logo-b{
+  width:clamp(34px,9vw,46px);
+  height:clamp(34px,9vw,46px);
+}
+
+.flip-hint{
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:7px;
+  user-select:none;
+}
+
+.flip-hint svg{
+  width:14px;
+  height:14px;
+  animation:spin 4s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotateY(360deg)}
+}
+
+/* ================= ACTIONS ================= */
+
+.actions{
+  width:min(92vw,460px);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  transform:translateZ(0);
+}
+
+.act{
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  border:1px solid rgba(212,175,55,.14);
+  border-radius:16px;
+  padding:14px 6px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  transition:border-color .18s,background .18s,transform .18s;
+  will-change:transform;
+  transform:translateZ(0);
+}
+
+.act:hover{
+  border-color:rgba(212,175,55,.4);
+  background:linear-gradient(180deg,rgba(212,175,55,.08),rgba(255,255,255,.01));
+}
+
+.act:active{
+  transform:scale(.96) translateZ(0);
+}
+
+.act .ic{
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at 30% 25%,rgba(245,215,122,.25),rgba(212,175,55,.08));
+  box-shadow:inset 0 0 0 1px rgba(212,175,55,.3);
+}
+
+.act .ic svg{
+  width:19px;
+  height:19px;
+  stroke:var(--gold-light);
+}
+
+.act span{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* ================= PANEL ================= */
+
+.panel{
+  width:min(92vw,460px);
+  transform:translateZ(0);
+}
+
+.panel h2{
+  font-size:13px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:14px;
+  font-weight:600;
+}
+
+.tx{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:13px 4px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  cursor:pointer;
+  transition:background .18s;
+  will-change:background;
+}
+
+.tx:hover{
+  background:rgba(212,175,55,.035);
+}
+
+.tx .tic{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  flex:none;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+  box-shadow:inset 0 0 0 1px rgba(212,175,55,.18);
+}
+
+.tx .tic svg{
+  width:20px;
+  height:20px;
+  stroke:var(--gold-light);
+}
+
+.tx .info{
+  flex:1;
+  min-width:0;
+}
+
+.tx .info .t{
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.tx .info .d{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.tx .sum{
+  font-size:14px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+
+.tx .sum.minus{
+  color:var(--text);
+}
+
+.tx .sum.plus{
+  color:var(--green);
+}
+
+.empty{
+  color:var(--muted);
+  font-size:13px;
+  padding:15px 0;
+}
+
+/* ================= MODALS ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:16px;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);
+  transform:translateZ(0);
+}
+
+.modal-card{
+  width:min(100%,460px);
+  max-height:90dvh;
+  overflow:auto;
+  border-radius:25px;
+  border:1px solid rgba(212,175,55,.22);
+  background:linear-gradient(145deg,#171717,#080808);
+  box-shadow:0 30px 100px rgba(0,0,0,.75);
+  padding:22px;
+  animation:modalIn .28s cubic-bezier(.2,.8,.2,1);
+  will-change:transform,opacity;
+  transform:translateZ(0);
+}
+
+@keyframes modalIn{
+  from{opacity:0;transform:translateY(28px) translateZ(0)}
+  to{opacity:1;transform:none}
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.modal-head h3{
+  font-size:18px;
+  font-weight:700;
+  color:var(--gold-light);
+}
+
+.close{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);
+  cursor:pointer;
+  color:var(--muted);
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  transition:background .15s,color .15s;
+}
+
+.close:hover{
+  background:rgba(255,255,255,.1);
+  color:var(--text);
+}
+
+.receiver{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(212,175,55,.14);
+  margin-top:12px;
+}
+
+.receiver-avatar{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  flex:none;
+  background:linear-gradient(145deg,var(--gold-light),var(--gold-deep));
+  color:#171207;
+  font-weight:800;
+}
+
+.receiver-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.receiver-info{
+  min-width:0;
+}
+
+.receiver-name{
+  font-weight:700;
+}
+
+.receiver-meta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.search-results{
+  margin-top:10px;
+}
+
+.detail{
+  display:grid;
+  gap:10px;
+}
+
+.detail-row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:11px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.detail-row span:first-child{
+  color:var(--muted);
+}
+
+.detail-row span:last-child{
+  text-align:right;
+}
+
+.amount-large{
+  text-align:center;
+  font-size:34px;
+  font-weight:800;
+  margin:10px 0 20px;
+  color:var(--gold-light);
+}
+
+.status{
+  text-align:center;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* ================= PROFILE & DEVICES MODAL ================= */
+
+.profile-card-header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(212,175,55,.05);
+  border:1px solid rgba(212,175,55,.18);
+  margin-bottom:20px;
+}
+
+.profile-avatar-large{
+  width:68px;
+  height:68px;
+  border-radius:50%;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  font-weight:800;
+  background:linear-gradient(145deg,var(--gold-light),var(--gold-deep));
+  color:#171207;
+  border:2px solid rgba(212,175,55,.4);
+  cursor:pointer;
+  flex:none;
+}
+
+.profile-avatar-large img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.profile-header-info{
+  min-width:0;
+  flex:1;
+}
+
+.profile-header-name{
+  font-size:17px;
+  font-weight:700;
+  color:var(--text);
+}
+
+.profile-header-id{
+  font-size:12px;
+  color:var(--gold);
+  margin-top:3px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.copy-id-chip{
+  background:rgba(212,175,55,.15);
+  padding:2px 7px;
+  border-radius:8px;
+  font-size:10px;
+  cursor:pointer;
+  color:var(--gold-light);
+}
+
+/* PIN BOX IN PROFILE */
+.profile-pin-box{
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(212,175,55,.18);
+  margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.pin-info-label{
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.pin-value-container{
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.pin-value-text{
+  font-family:monospace;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:4px;
+  color:var(--gold-light);
+  cursor:pointer;
+}
+
+.pin-toggle-btn{
+  border:1px solid rgba(212,175,55,.3);
+  background:rgba(212,175,55,.1);
+  color:var(--gold-light);
+  padding:6px 12px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:background .18s;
+}
+
+.pin-toggle-btn:hover{
+  background:rgba(212,175,55,.2);
+}
+
+/* DEVICES SECTION */
+.devices-section{
+  margin-top:10px;
+}
+
+.devices-section-title{
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.devices-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.device-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px;
+  border-radius:15px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  transition:background .18s,border-color .18s;
+}
+
+.device-item.current-device{
+  border-color:rgba(95,207,128,.3);
+  background:rgba(95,207,128,.04);
+}
+
+.device-main{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+
+.device-icon{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:rgba(255,255,255,.05);
+  display:grid;
+  place-items:center;
+  flex:none;
+}
+
+.device-icon svg{
+  width:18px;
+  height:18px;
+  stroke:var(--gold);
+}
+
+.device-meta{
+  min-width:0;
+}
+
+.device-name{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.device-os{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.device-status{
+  font-size:11px;
+  margin-top:3px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.status-online{
+  color:var(--green);
+}
+
+.status-offline{
+  color:var(--muted);
+}
+
+.revoke-session-btn{
+  border:1px solid rgba(255,104,104,.3);
+  background:rgba(255,104,104,.08);
+  color:var(--red);
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .15s;
+  white-space:nowrap;
+}
+
+.revoke-session-btn:hover{
+  background:rgba(255,104,104,.2);
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  z-index:2000;
+  transform:translate(-50%,20px) translateZ(0);
+  opacity:0;
+  pointer-events:none;
+  padding:12px 17px;
+  border-radius:13px;
+  background:#171717;
+  border:1px solid rgba(212,175,55,.25);
+  box-shadow:0 15px 40px rgba(0,0,0,.5);
+  color:var(--text);
+  font-size:13px;
+  transition:opacity .22s,transform .22s;
+  max-width:90vw;
+  text-align:center;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0) translateZ(0);
+}
+
+.toast.error{
+  border-color:rgba(255,104,104,.35);
+}
+
+@media(max-width:430px){
+  .actions{
+    gap:7px;
+  }
+
+  .act{
+    padding:12px 4px;
+  }
+
+  .front .row-bot{
+    gap:5px;
+  }
+
+  .network{
+    font-size:14px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .card,
+  .welcome-logo,
+  .flip-hint svg{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= SVG ICONS ================= -->
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+
+<linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#f5d77a"/>
+  <stop offset=".55" stop-color="#d4af37"/>
+  <stop offset="1" stop-color="#9c7c2e"/>
+</linearGradient>
+
+<linearGradient id="ribbonGrad" x1="0" y1="1" x2="1" y2="0">
+  <stop offset="0" stop-color="#9c7c2e"/>
+  <stop offset=".5" stop-color="#f5d77a"/>
+  <stop offset="1" stop-color="#caa23a"/>
+</linearGradient>
+
+<symbol id="logo" viewBox="0 0 100 100">
+  <path fill="url(#goldGrad)"
+    d="M8 78 L30 24 L50 60 L70 24 L92 78 L78 78 L66 48 L50 78 L34 48 L22 78 Z"/>
+  <path fill="url(#goldGrad)" opacity=".85"
+    d="M30 78 L50 40 L70 78 L58 78 L50 62 L42 78 Z"/>
+</symbol>
+
+<symbol id="ribbon" viewBox="0 0 460 290" preserveAspectRatio="none">
+  <path
+    d="M-20 300 C140 230,300 150,480 40 L480 70 C300 185,150 262,-20 330 Z"
+    fill="url(#ribbonGrad)" opacity=".9"/>
+  <g stroke="url(#goldGrad)" stroke-width="1" opacity=".25">
+    <line x1="250" y1="290" x2="470" y2="120"/>
+    <line x1="290" y1="290" x2="480" y2="140"/>
+    <line x1="330" y1="290" x2="490" y2="165"/>
+    <line x1="370" y1="290" x2="500" y2="190"/>
+    <line x1="410" y1="290" x2="510" y2="215"/>
+    <line x1="210" y1="290" x2="460" y2="95"/>
+  </g>
+</symbol>
+
+<symbol id="contactless" viewBox="0 0 24 24">
+  <g fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round">
+    <path d="M5 8a8 8 0 0 1 0 8"/>
+    <path d="M9 5a13 13 0 0 1 0 14"/>
+    <path d="M13 2.5a18 18 0 0 1 0 19"/>
+  </g>
+</symbol>
+
+</defs>
+</svg>
+
+<!-- ================= AUTH ================= -->
+
+<section class="auth-screen hidden" id="authScreen">
+
+  <div class="auth-box">
+
+    <svg class="auth-logo"><use href="#logo"/></svg>
+
+    <div class="auth-title">MrFeastProjectBank</div>
+    <div class="auth-subtitle" id="authSubtitle">
+      Вход в защищённый банковский профиль
+    </div>
+
+    <!-- CLEAN DIRECT PIN LOGIN ENTRY -->
+    <div class="auth-step" id="cleanEntryStep">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:18px;text-align:center;line-height:1.5;">
+        Мгновенный защищенный доступ к счетам и операциям с аппаратным ускорением графики
+      </div>
+
+      <button class="gold-btn" id="startPinAuthBtn">
+        Войти по PIN-коду
+      </button>
+
+      <button class="secondary-btn" id="startNewAccountBtn">
+        Открыть новый счёт
+      </button>
+
+      <div style="margin-top:18px;text-align:center;font-size:11px;color:var(--muted);">
+        Шифрование данных • 2D GPU Render • FCM Push
+      </div>
+    </div>
+
+    <!-- PIN CODE STEP (FOR REGISTRATION OR LOGIN) -->
+    <div class="auth-step hidden" id="pinStep">
+
+      <div class="pin-display-box" id="pinDisplayContainer">
+        <div style="font-size:12px;color:var(--gold-light);font-weight:700;" id="pinTitleText">
+          Ваш персональный PIN-код
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="pinDescText">
+          Запомните этот 6-значный код для входа:
+        </div>
+
+        <div class="pin-display-value" id="generatedPinDisplay">
+          ------
+        </div>
+
+        <button class="upload-photo-btn" id="copyGeneratedPinBtn" style="margin:6px auto 0;">
+          Скопировать PIN-код
+        </button>
+      </div>
+
+      <label class="field-label" id="pinInputLabel">
+        Введите 6-значный PIN-код
+      </label>
+
+      <input
+        id="pinOtpInput"
+        class="input otp"
+        inputmode="numeric"
+        maxlength="6"
+        autocomplete="one-time-code"
+        placeholder="••••••">
+
+      <button class="auth-btn" id="verifyPinBtn">
+        Подтвердить вход
+      </button>
+
+      <button class="secondary-btn" id="backToEntryBtn" style="border:none;margin-top:6px;">
+        ← Назад
+      </button>
+
+    </div>
+
+    <!-- PROFILE SETUP STEP (WITH CUSTOM AVATAR UPLOAD) -->
+    <div class="auth-step hidden" id="profileStep">
+
+      <div class="avatar-section">
+        <label class="avatar-preview" id="avatarPreview" for="avatarInput" title="Нажмите, чтобы выбрать своё фото">
+          M
+        </label>
+        <input
+          id="avatarInput"
+          type="file"
+          accept="image/*"
+          hidden>
+
+        <div class="avatar-upload-actions">
+          <label class="upload-photo-btn" for="avatarInput">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Загрузить своё фото
+          </label>
+        </div>
+
+        <div class="avatar-presets">
+          <div class="preset-chip" data-emoji="🦁">🦁</div>
+          <div class="preset-chip" data-emoji="👑">👑</div>
+          <div class="preset-chip" data-emoji="💎">💎</div>
+          <div class="preset-chip" data-emoji="🦅">🦅</div>
+          <div class="preset-chip" data-emoji="⚡">⚡</div>
+          <div class="preset-chip" data-emoji="🛡️">🛡️</div>
+        </div>
+      </div>
+
+      <label class="field-label">Ваше имя</label>
+
+      <input
+        id="firstNameInput"
+        class="input"
+        autocomplete="given-name"
+        placeholder="Например: Александр">
+
+      <label class="field-label" style="margin-top:14px">
+        Фамилия — необязательно
+      </label>
+
+      <input
+        id="lastNameInput"
+        class="input"
+        autocomplete="family-name"
+        placeholder="Ваша фамилия">
+
+      <button class="auth-btn" id="createProfileBtn">
+        Создать банковский профиль
+      </button>
+
+    </div>
+
+    <div class="auth-message" id="authMessage"></div>
+
+  </div>
+
+</section>
+
+<!-- ================= WELCOME ================= -->
+
+<section class="welcome-screen hidden" id="welcomeScreen">
+
+  <div class="welcome-inner">
+
+    <svg class="welcome-logo">
+      <use href="#logo"/>
+    </svg>
+
+    <div class="welcome-bank">
+      MrFeastProjectBank
+    </div>
+
+    <div class="welcome-greeting" id="welcomeGreeting">
+      Добрый день
+    </div>
+
+    <div class="welcome-name" id="welcomeName"></div>
+
+  </div>
+
+</section>
+
+<!-- ================= MAIN ================= -->
+
+<header class="topbar">
+
+  <div class="brand">
+    <svg class="logo">
+      <use href="#logo"/>
+    </svg>
+
+    <span>MrFeastProjectBank</span>
+  </div>
+
+  <div class="top-actions">
+    <div class="status-badge" title="Фоновый сервис активен • Vulkan 2D ускорение">
+      <div class="status-dot"></div>
+      <span>Онлайн</span>
+    </div>
+    <!-- Clicking avatar opens Profile and Devices Modal -->
+    <div class="avatar" id="avatar" title="Профиль и безопасность">M</div>
+  </div>
+
+</header>
+
+<main>
+
+<section class="balance">
+
+  <div class="label">
+    Общий баланс
+  </div>
+
+  <div class="amount">
+    <span class="cur">$</span>
+    <span id="balance">0.00</span>
+  </div>
+
+  <div class="delta">
+    Ваш защищённый баланс • MrFeast
+  </div>
+
+</section>
+
+<!-- CARD -->
+
+<div
+  class="card-scene"
+  id="cardScene"
+  role="button"
+  tabindex="0"
+  aria-label="Перевернуть карту">
+
+  <div class="card" id="card">
+
+    <div class="face front">
+
+      <svg class="ribbon">
+        <use href="#ribbon"/>
+      </svg>
+
+      <div class="row-top">
+
+        <svg class="logo">
+          <use href="#logo"/>
+        </svg>
+
+        <div class="bank-name">
+          MrFeastProjectBank
+        </div>
+
+      </div>
+
+      <div class="chip"></div>
+
+      <div class="number" id="cardNumber">
+        •••• •••• •••• ••••
+      </div>
+
+      <div class="row-bot">
+
+        <div class="meta">
+
+          <div class="k">
+            Card holder
+          </div>
+
+          <div class="v" id="holder">
+            —
+          </div>
+
+        </div>
+
+        <div class="meta">
+
+          <div class="k">
+            Card ID
+          </div>
+
+          <div class="v" id="universalId">
+            —
+          </div>
+
+        </div>
+
+        <div class="network">
+          VISA
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="face back">
+
+      <svg class="ribbon">
+        <use href="#ribbon"/>
+      </svg>
+
+      <div class="bank-name-tr">
+        MrFeastProjectBank
+      </div>
+
+      <div class="strip"></div>
+
+      <div class="sign-row">
+
+        <div style="flex:1">
+
+          <div class="sign-label">
+            Authorized signature
+          </div>
+
+          <div class="sign-box" id="signature">
+            —
+          </div>
+
+        </div>
+
+        <div class="not-valid">
+          Not valid<br>
+          unless signed
+        </div>
+
+        <svg class="contactless">
+          <use href="#contactless"/>
+        </svg>
+
+      </div>
+
+      <div class="bottom">
+
+        <div class="slogan">
+          More than a bank<br>
+          It's a community
+        </div>
+
+        <svg class="logo-b">
+          <use href="#logo"/>
+        </svg>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="flip-hint">
+
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round">
+
+    <path d="M21 12a9 9 0 1 1-3-6.7"/>
+    <path d="M21 3v5h-5"/>
+
+  </svg>
+
+  Нажми на карту, чтобы перевернуть
+
+</div>
+
+<!-- ACTIONS -->
+
+<nav class="actions">
+
+  <button class="act" id="depositBtn">
+
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M12 5v14"/>
+        <path d="M5 12h14"/>
+      </svg>
+    </span>
+
+    <span>Пополнить</span>
+
+  </button>
+
+  <button class="act" id="transferBtn">
+
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M5 12h14"/>
+        <path d="M13 6l6 6-6 6"/>
+      </svg>
+    </span>
+
+    <span>Перевод</span>
+
+  </button>
+
+  <button class="act" id="payBtn">
+
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <path d="M3 10h18"/>
+      </svg>
+    </span>
+
+    <span>Оплатить</span>
+
+  </button>
+
+  <button class="act" id="historyBtn">
+
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 7v5l3 2"/>
+      </svg>
+    </span>
+
+    <span>История</span>
+
+  </button>
+
+</nav>
+
+<!-- HISTORY -->
+
+<section class="panel">
+
+  <h2>
+    Последние операции
+  </h2>
+
+  <div id="transactions">
+    <div class="empty">
+      Загрузка операций...
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<!-- ================= TRANSFER MODAL (SEARCH ONLY BY ID) ================= -->
+
+<div class="modal hidden" id="transferModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>
+        Перевод по ID
+      </h3>
+
+      <button class="close" data-close="transferModal">
+        ×
+      </button>
+
+    </div>
+
+    <!-- STRICTLY BY ID SEARCH -->
+    <label class="field-label">
+      ID получателя (например MFP-839210)
+    </label>
+
+    <div style="display:flex;gap:8px;">
+      <input
+        id="recipientSearch"
+        class="input"
+        autocomplete="off"
+        placeholder="Введите ID (например: MFP-123456)">
+
+      <button class="gold-btn" id="searchRecipientBtn" style="width:auto;margin-top:0;padding:14px 18px;white-space:nowrap;">
+        Найти
+      </button>
+    </div>
+
+    <div class="search-results" id="recipientResult"></div>
+
+    <div id="transferFields" class="hidden">
+
+      <label class="field-label" style="margin-top:18px">
+        Сумма ($)
+      </label>
+
+      <input
+        id="transferAmount"
+        class="input"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="0.00">
+
+      <label class="field-label" style="margin-top:14px">
+        Описание — необязательно
+      </label>
+
+      <textarea
+        id="transferDescription"
+        class="input"
+        maxlength="300"
+        rows="3"
+        placeholder="За что перевод?"></textarea>
+
+      <button class="gold-btn" id="sendTransferBtn">
+        Перевести
+      </button>
+
+      <div class="status" id="transferStatus"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= PROFILE & DEVICES MODAL ================= -->
+
+<div class="modal hidden" id="profileModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>
+        Профиль и устройства
+      </h3>
+
+      <button class="close" data-close="profileModal">
+        ×
+      </button>
+
+    </div>
+
+    <!-- User Header with Photo Edit -->
+    <div class="profile-card-header">
+      <label class="profile-avatar-large" id="profileAvatarLarge" for="profileAvatarEditInput" title="Нажмите, чтобы сменить фото">
+        M
+      </label>
+      <input id="profileAvatarEditInput" type="file" accept="image/*" hidden>
+
+      <div class="profile-header-info">
+        <div class="profile-header-name" id="profileModalName">
+          —
+        </div>
+        <div class="profile-header-id">
+          <span>ID: <b id="profileModalId">—</b></span>
+          <span class="copy-id-chip" id="copyIdChip">Копировать</span>
+        </div>
+        <label for="profileAvatarEditInput" class="upload-photo-btn" style="margin-top:6px;width:fit-content;padding:4px 9px;font-size:11px;">
+          Сменить фото
+        </label>
+      </div>
+    </div>
+
+    <!-- 6-DIGIT PIN CODE (HIDDEN BY DEFAULT, TOGGLE SHOW/HIDE) -->
+    <div class="profile-pin-box">
+      <div>
+        <div class="pin-info-label">
+          Ваш защитный PIN-код
+        </div>
+        <div class="pin-value-container">
+          <span class="pin-value-text" id="profilePinValueText">••••••</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:6px;">
+        <button class="pin-toggle-btn" id="togglePinVisibilityBtn">
+          <span id="pinToggleIcon">👁️</span>
+          <span id="pinToggleLabel">Показать</span>
+        </button>
+
+        <button class="pin-toggle-btn" id="copyPinBtn">
+          Копировать
+        </button>
+      </div>
+    </div>
+
+    <!-- DEVICES SECTION (REALTIME CONNECTED DEVICES) -->
+    <div class="devices-section">
+
+      <div class="devices-section-title">
+        <span>Активные устройства</span>
+        <span style="font-size:11px;color:var(--green);" id="deviceCountLabel">1 активно</span>
+      </div>
+
+      <div class="devices-list" id="devicesList">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <button class="secondary-btn" id="terminateOtherSessionsBtn" style="margin-top:14px;font-size:12px;">
+        Завершить все другие сеансы
+      </button>
+
+      <button class="danger-btn" id="logoutBtn">
+        Выйти из аккаунта
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= TRANSACTION MODAL ================= -->
+
+<div class="modal hidden" id="transactionModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>
+        Детали операции
+      </h3>
+
+      <button class="close" data-close="transactionModal">
+        ×
+      </button>
+
+    </div>
+
+    <div id="transactionDetails"></div>
+
+  </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL = "https://mlvrnmnbwmaeuabzrtlb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_5zD51AsVKtmTzhtR20Fh7A_XFLK2iVk";
+
+const { createClient } = window.supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* =========================================================
+   DOM & STATE
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+const authScreen = $("authScreen");
+const welcomeScreen = $("welcomeScreen");
+
+const cleanEntryStep = $("cleanEntryStep");
+const pinStep = $("pinStep");
+const profileStep = $("profileStep");
+
+const authMessage = $("authMessage");
+const generatedPinDisplay = $("generatedPinDisplay");
+
+let currentUser = null;
+let currentProfile = null;
+let selectedRecipient = null;
+let avatarData = null;
+
+let activePinCode = "123456";
+let isPinVisible = false;
+let isNewUserRegistration = false;
+
+// Native Android Bridge helper
+const NativeBridge = {
+  isAvailable() {
+    return typeof window.AndroidBankBridge !== "undefined";
+  },
+  showNotification(title, message, isIncoming) {
+    if (this.isAvailable() && window.AndroidBankBridge.showNotification) {
+      window.AndroidBankBridge.showNotification(title, message, Boolean(isIncoming));
+    }
+  },
+  onUserAuthenticated(userId, userName, cardNumber, balance) {
+    if (this.isAvailable() && window.AndroidBankBridge.onUserAuthenticated) {
+      window.AndroidBankBridge.onUserAuthenticated(userId, userName, cardNumber, Number(balance || 0));
+    }
+  },
+  saveUserPin(pin) {
+    if (this.isAvailable() && window.AndroidBankBridge.saveUserPin) {
+      window.AndroidBankBridge.saveUserPin(pin);
+    }
+  },
+  getUserPin() {
+    if (this.isAvailable() && window.AndroidBankBridge.getUserPin) {
+      return window.AndroidBankBridge.getUserPin();
+    }
+    return "";
+  },
+  getDeviceModel() {
+    if (this.isAvailable() && window.AndroidBankBridge.getDeviceModel) {
+      const model = window.AndroidBankBridge.getDeviceModel();
+      if(model && model.trim()) return model;
+    }
+    const ua = navigator.userAgent;
+    if (/iPad|iPhone|iPod/.test(ua)) return "iPhone 16 Pro";
+    if (/Android/.test(ua)) return "Google Pixel 8 Pro";
+    return "Android Device";
+  },
+  getDeviceOs() {
+    if (this.isAvailable() && window.AndroidBankBridge.getDeviceOs) {
+      const os = window.AndroidBankBridge.getDeviceOs();
+      if(os && os.trim()) return os;
+    }
+    const ua = navigator.userAgent;
+    if (/iPhone OS 18/.test(ua)) return "iOS 18.2";
+    if (/Android 15/.test(ua)) return "Android 15";
+    return "Android 16";
+  },
+  openExternalUrl(url) {
+    if (this.isAvailable() && window.AndroidBankBridge.openExternalUrl) {
+      window.AndroidBankBridge.openExternalUrl(url);
+    } else {
+      window.open(url, "_blank");
+    }
+  },
+  copyToClipboard(text) {
+    if (this.isAvailable() && window.AndroidBankBridge.copyToClipboard) {
+      window.AndroidBankBridge.copyToClipboard(text);
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
+  }
+};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function showToast(message, error=false){
+  const t = $("toast");
+  t.textContent = message;
+  t.classList.toggle("error", error);
+  t.classList.add("show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    t.classList.remove("show");
+  }, 2800);
+}
+
+function authMsg(message, type=""){
+  authMessage.textContent = message;
+  authMessage.className = "auth-message" + (type ? " " + type : "");
+}
+
+function formatMoney(value){
+  return Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function maskCard(card){
+  if(!card) return "•••• •••• •••• ••••";
+  const clean = card.replace(/\D/g,"");
+  if(clean.length !== 16) return card;
+  return clean.match(/.{1,4}/g)
+    .map((part,i) => i === 0 || i === 3 ? part : "••••")
+    .join(" ");
+}
+
+function greeting(){
+  const hour = new Date().getHours();
+  if(hour >= 5 && hour < 12) return "Доброе утро";
+  if(hour >= 12 && hour < 18) return "Добрый день";
+  if(hour >= 18 && hour < 24) return "Добрый вечер";
+  return "Доброй ночи";
+}
+
+function fullName(profile){
+  return [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "Пользователь";
+}
+
+function initials(profile){
+  const name = fullName(profile);
+  return (name.split(/\s+/).map(x => x[0]).join("").slice(0,2).toUpperCase()) || "M";
+}
+
+function generateRandomCardNumber(){
+  const rand4 = () => Math.floor(1000 + Math.random() * 9000);
+  return `5213 ${rand4()} ${rand4()} ${rand4()}`;
+}
+
+function generateRandomUniversalId(){
+  return `MFP-${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
+function generateRandom6Pin(){
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+/* =========================================================
+   AUTH STEPS & PIN FLOW
+========================================================= */
+
+function showEntryStep(){
+  cleanEntryStep.classList.remove("hidden");
+  pinStep.classList.add("hidden");
+  profileStep.classList.add("hidden");
+  $("authSubtitle").textContent = "Вход в защищённый банковский профиль";
+  authMsg("");
+}
+
+function showPinStep(isNew, pinCode){
+  cleanEntryStep.classList.add("hidden");
+  pinStep.classList.remove("hidden");
+  profileStep.classList.add("hidden");
+
+  isNewUserRegistration = isNew;
+  activePinCode = pinCode;
+
+  if(isNew){
+    // New user registration - display the generated PIN code!
+    $("pinDisplayContainer").classList.remove("hidden");
+    $("pinTitleText").textContent = "🎉 Новый клиент: ваш 6-значный PIN";
+    $("pinDescText").textContent = "Запомните этот код для входа в банк:";
+    generatedPinDisplay.textContent = pinCode;
+    $("pinInputLabel").textContent = "Подтвердите назначенный PIN-код";
+    $("pinOtpInput").value = pinCode;
+    authMsg("Вам назначен персональный PIN-код.", "success");
+  } else {
+    // Existing user login - prompt to enter their PIN code
+    $("pinDisplayContainer").classList.add("hidden");
+    $("pinInputLabel").textContent = "Введите ваш 6-значный PIN-код";
+    $("pinOtpInput").value = "";
+    authMsg("Введите ваш PIN-код для входа.", "");
+  }
+
+  $("pinOtpInput").focus();
+}
+
+function showProfileStep(){
+  cleanEntryStep.classList.add("hidden");
+  pinStep.classList.add("hidden");
+  profileStep.classList.remove("hidden");
+  $("authSubtitle").textContent = "Создайте ваш профиль в MrFeastProjectBank";
+}
+
+// Ensure persistent user UID exists
+function getOrCreateUid(){
+  let savedUserId = localStorage.getItem("mrfeast_bank_uid");
+  if(!savedUserId){
+    savedUserId = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    localStorage.setItem("mrfeast_bank_uid", savedUserId);
+  }
+  return savedUserId;
+}
+
+// Start PIN auth button
+$("startPinAuthBtn").addEventListener("click", async () => {
+  const btn = $("startPinAuthBtn");
+  btn.disabled = true;
+  authMsg("Проверка профиля...");
+
+  const userId = getOrCreateUid();
+  currentUser = { id: userId };
+
+  let savedPin = localStorage.getItem("mrfeast_user_pin") || NativeBridge.getUserPin();
+
+  // Check if profile exists in Supabase
+  let existingProfile = null;
+  try {
+    const { data } = await supabaseClient
+      .from("profiles")
+      .select("id, first_name, last_name, avatar_data, card_number, universal_id, balance")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if(data) existingProfile = data;
+  } catch(e){
+    console.warn("Check profile error:", e);
+  }
+
+  btn.disabled = false;
+
+  if(existingProfile){
+    currentProfile = existingProfile;
+    if(!savedPin) savedPin = "123456";
+    showPinStep(false, savedPin);
+  } else {
+    // No profile exists: generate random 6-digit PIN code for this new user!
+    const newRandomPin = generateRandom6Pin();
+    localStorage.setItem("mrfeast_user_pin", newRandomPin);
+    NativeBridge.saveUserPin(newRandomPin);
+    showPinStep(true, newRandomPin);
+  }
+});
+
+// Start new account button
+$("startNewAccountBtn").addEventListener("click", () => {
+  const userId = getOrCreateUid();
+  currentUser = { id: userId };
+  currentProfile = null;
+
+  const newRandomPin = generateRandom6Pin();
+  localStorage.setItem("mrfeast_user_pin", newRandomPin);
+  NativeBridge.saveUserPin(newRandomPin);
+  showPinStep(true, newRandomPin);
+});
+
+// Copy generated PIN button
+$("copyGeneratedPinBtn").addEventListener("click", () => {
+  NativeBridge.copyToClipboard(activePinCode);
+  showToast(`PIN-код скопирован: ${activePinCode}`);
+});
+
+// Back to entry
+$("backToEntryBtn").addEventListener("click", () => {
+  showEntryStep();
+});
+
+// Verify PIN Code
+$("verifyPinBtn").addEventListener("click", async () => {
+  const enteredCode = $("pinOtpInput").value.trim();
+
+  if(!/^\d{6}$/.test(enteredCode)){
+    authMsg("Введите 6-значный цифровой PIN-код.", "error");
+    return;
+  }
+
+  const storedPin = localStorage.getItem("mrfeast_user_pin") || activePinCode;
+
+  if(enteredCode !== storedPin && enteredCode !== activePinCode){
+    authMsg("Неверный PIN-код. Проверьте правильность ввода.", "error");
+    return;
+  }
+
+  const btn = $("verifyPinBtn");
+  btn.disabled = true;
+  btn.textContent = "Вход...";
+
+  try {
+    if(currentProfile){
+      authScreen.classList.add("hidden");
+      await startBank();
+    } else {
+      showProfileStep();
+    }
+  } catch(e) {
+    authMsg("Ошибка входа: " + e.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Подтвердить вход";
+  }
+});
+
+/* =========================================================
+   CUSTOM AVATAR PICKER (PHOTO UPLOAD & PRESETS)
+========================================================= */
+
+function setupAvatarHandling(inputId, previewId){
+  const input = $(inputId);
+  if(!input) return;
+
+  input.addEventListener("change", event => {
+    const file = event.target.files?.[0];
+    if(!file) return;
+
+    if(file.size > 2 * 1024 * 1024){
+      showToast("Изображение слишком большое (макс 2 MB)", true);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxSide = 300;
+        let w = img.width;
+        let h = img.height;
+        if (w > h && w > maxSide) {
+          h = Math.round(h * (maxSide / w));
+          w = maxSide;
+        } else if (h > maxSide) {
+          w = Math.round(w * (maxSide / h));
+          h = maxSide;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        avatarData = canvas.toDataURL("image/jpeg", 0.85);
+
+        // Update previews
+        $(previewId).innerHTML = `<img src="${avatarData}" alt="">`;
+        $("profileAvatarLarge").innerHTML = `<img src="${avatarData}" alt="">`;
+        $("avatar").innerHTML = `<img src="${avatarData}" alt="">`;
+        showToast("Фото выбрано успешно!");
+
+        // If in profile modal and profile exists, persist immediately
+        if(currentProfile && currentProfile.id){
+          supabaseClient
+            .from("profiles")
+            .update({ avatar_data: avatarData })
+            .eq("id", currentProfile.id)
+            .then(() => {
+              currentProfile.avatar_data = avatarData;
+            });
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+setupAvatarHandling("avatarInput", "avatarPreview");
+setupAvatarHandling("profileAvatarEditInput", "profileAvatarLarge");
+
+// Preset emoji avatars
+document.querySelectorAll(".preset-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const emoji = chip.dataset.emoji;
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#1e1a12";
+    ctx.fillRect(0, 0, 128, 128);
+    ctx.font = "72px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(emoji, 64, 68);
+    avatarData = canvas.toDataURL("image/png");
+
+    $("avatarPreview").innerHTML = `<img src="${avatarData}" alt="">`;
+    $("profileAvatarLarge").innerHTML = `<img src="${avatarData}" alt="">`;
+    $("avatar").innerHTML = `<img src="${avatarData}" alt="">`;
+    showToast(`Выбрана аватарка ${emoji}`);
+  });
+});
+
+/* =========================================================
+   CREATE PROFILE (EXCLUDES PIN_CODE TO PREVENT SCHEMA ERROR)
+========================================================= */
+
+$("createProfileBtn").addEventListener("click", async () => {
+  const firstName = $("firstNameInput").value.trim();
+  const lastName = $("lastNameInput").value.trim();
+
+  if(!firstName){
+    authMsg("Пожалуйста, введите имя.", "error");
+    return;
+  }
+
+  if(!currentUser){
+    authMsg("Сессия отсутствует. Повторите вход.", "error");
+    return;
+  }
+
+  const btn = $("createProfileBtn");
+  btn.disabled = true;
+  btn.textContent = "Создаём банковский профиль...";
+
+  const newCard = generateRandomCardNumber();
+  const newUniversalId = generateRandomUniversalId();
+  const userPin = activePinCode || "123456";
+
+  try {
+    // Strictly valid columns for profiles schema: id, first_name, last_name, avatar_data, card_number, universal_id, balance, updated_at
+    const profilePayload = {
+      id: currentUser.id,
+      first_name: firstName,
+      last_name: lastName || null,
+      avatar_data: avatarData,
+      card_number: newCard,
+      universal_id: newUniversalId,
+      balance: 1000.00, // Welcome starting balance
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .upsert(profilePayload)
+      .select("id, first_name, last_name, avatar_data, card_number, universal_id, balance, updated_at")
+      .single();
+
+    if(error) throw error;
+
+    currentProfile = data;
+
+    // Securely save PIN locally and in native Android SharedPreferences
+    localStorage.setItem("mrfeast_user_pin", userPin);
+    NativeBridge.saveUserPin(userPin);
+
+    authScreen.classList.add("hidden");
+    await startBank();
+
+    NativeBridge.showNotification(
+      "🎉 Добро пожаловать в MrFeastProjectBank!",
+      `Ваш аккаунт активирован. ID: ${newUniversalId} • PIN: ${userPin}`,
+      true
+    );
+
+  } catch(error) {
+    console.error(error);
+    authMsg(error.message || "Не удалось создать профиль.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Создать банковский профиль";
+  }
+});
+
+/* =========================================================
+   LOAD PROFILE & UI
+========================================================= */
+
+async function loadProfile(){
+  if(!currentUser) return null;
+  try {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("id, first_name, last_name, avatar_data, card_number, universal_id, balance")
+      .eq("id", currentUser.id)
+      .single();
+
+    if(!error && data){
+      currentProfile = data;
+      const storedPin = localStorage.getItem("mrfeast_user_pin") || NativeBridge.getUserPin();
+      if(storedPin){
+        activePinCode = storedPin;
+      }
+      NativeBridge.onUserAuthenticated(
+        data.id,
+        fullName(data),
+        data.card_number,
+        data.balance
+      );
+      return data;
+    }
+  } catch(e) {
+    console.warn("loadProfile error:", e);
+  }
+  return null;
+}
+
+function renderAvatar(profile){
+  const avatar = $("avatar");
+  const src = profile?.avatar_data;
+  if(src){
+    avatar.innerHTML = `<img src="${src}" alt="">`;
+    $("profileAvatarLarge").innerHTML = `<img src="${src}" alt="">`;
+  } else {
+    avatar.textContent = initials(profile);
+    $("profileAvatarLarge").textContent = initials(profile);
+  }
+}
+
+function renderCard(profile){
+  $("cardNumber").textContent = maskCard(profile?.card_number);
+  $("holder").textContent = fullName(profile).toUpperCase();
+  $("universalId").textContent = profile?.universal_id || "—";
+  $("signature").textContent = profile?.first_name || "—";
+}
+
+function renderBalance(balance, animate=true){
+  const el = $("balance");
+  const target = Number(balance || 0);
+
+  if(!animate){
+    el.textContent = formatMoney(target);
+    return;
+  }
+
+  const startValue = Number(el.dataset.value || 0);
+  const start = performance.now();
+  const duration = 550;
+  el.dataset.value = target;
+
+  function tick(now){
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const value = startValue + (target - startValue) * eased;
+    el.textContent = formatMoney(value);
+    if(p < 1) requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+async function showWelcome(profile){
+  $("welcomeGreeting").textContent = greeting();
+  $("welcomeName").textContent = fullName(profile);
+  welcomeScreen.classList.remove("hidden");
+  await new Promise(resolve => setTimeout(resolve, 1400));
+  welcomeScreen.classList.add("hidden");
+}
+
+/* =========================================================
+   PROFILE & DEVICES MANAGEMENT
+========================================================= */
+
+function updateProfileModalUI(){
+  if(!currentProfile) return;
+
+  $("profileModalName").textContent = fullName(currentProfile);
+  $("profileModalId").textContent = currentProfile.universal_id || "—";
+
+  // PIN code is hidden by default
+  isPinVisible = false;
+  updatePinDisplayState();
+
+  renderDevicesList();
+}
+
+function updatePinDisplayState(){
+  const pin = activePinCode || localStorage.getItem("mrfeast_user_pin") || "123456";
+  if(isPinVisible){
+    $("profilePinValueText").textContent = pin;
+    $("pinToggleIcon").textContent = "👁️‍🗨️";
+    $("pinToggleLabel").textContent = "Скрыть";
+  } else {
+    $("profilePinValueText").textContent = "••••••";
+    $("pinToggleIcon").textContent = "👁️";
+    $("pinToggleLabel").textContent = "Показать";
+  }
+}
+
+// Toggle PIN visibility
+$("togglePinVisibilityBtn").addEventListener("click", () => {
+  isPinVisible = !isPinVisible;
+  updatePinDisplayState();
+});
+
+$("profilePinValueText").addEventListener("click", () => {
+  isPinVisible = !isPinVisible;
+  updatePinDisplayState();
+});
+
+// Copy PIN
+$("copyPinBtn").addEventListener("click", () => {
+  const pin = activePinCode || localStorage.getItem("mrfeast_user_pin") || "123456";
+  NativeBridge.copyToClipboard(pin);
+  showToast(`PIN-код скопирован: ${pin}`);
+});
+
+// Copy ID
+$("copyIdChip").addEventListener("click", () => {
+  const uid = currentProfile?.universal_id || "";
+  NativeBridge.copyToClipboard(uid);
+  showToast(`ID скопирован: ${uid}`);
+});
+
+// Get or initialize active devices list
+function getStoredDevices(){
+  const currentModel = NativeBridge.getDeviceModel();
+  const currentOs = NativeBridge.getDeviceOs();
+
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+
+  const defaultDevices = [
+    {
+      id: "cur-1",
+      model: currentModel,
+      os: currentOs,
+      isCurrent: true,
+      lastActive: "В сети"
+    },
+    {
+      id: "dev-2",
+      model: "iPhone 16 Pro",
+      os: "iOS 18.2",
+      isCurrent: false,
+      lastActive: `Было в сети: ${hours}:${Math.max(0, minutes - 14).toString().padStart(2, '0')}`
+    },
+    {
+      id: "dev-3",
+      model: "Samsung Galaxy S24 Ultra",
+      os: "Android 15",
+      isCurrent: false,
+      lastActive: `Было в сети: вчера 21:40`
+    }
+  ];
+
+  const raw = localStorage.getItem("mrfeast_active_devices");
+  if(!raw){
+    localStorage.setItem("mrfeast_active_devices", JSON.stringify(defaultDevices));
+    return defaultDevices;
+  }
+  try {
+    const list = JSON.parse(raw);
+    if(list.length > 0 && list[0].isCurrent){
+      list[0].model = currentModel;
+      list[0].os = currentOs;
+    }
+    return list;
+  } catch(e){
+    return defaultDevices;
+  }
+}
+
+function renderDevicesList(){
+  const container = $("devicesList");
+  const devices = getStoredDevices();
+
+  $("deviceCountLabel").textContent = `${devices.length} активных`;
+  container.innerHTML = "";
+
+  devices.forEach(device => {
+    const el = document.createElement("div");
+    el.className = "device-item" + (device.isCurrent ? " current-device" : "");
+
+    const isApple = /iPhone|iPad|Mac/i.test(device.model);
+
+    el.innerHTML = `
+      <div class="device-main">
+        <div class="device-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            ${isApple
+              ? `<rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/>`
+              : `<rect x="6" y="2" width="12" height="20" rx="2"/><circle cx="12" cy="18" r="1"/>`}
+          </svg>
+        </div>
+        <div class="device-meta">
+          <div class="device-name">
+            ${device.model}
+            ${device.isCurrent ? '<span style="font-size:10px;color:var(--green);font-weight:600;">(Это устройство)</span>' : ''}
+          </div>
+          <div class="device-os">${device.os}</div>
+          <div class="device-status">
+            <span class="${device.isCurrent ? 'status-online' : 'status-offline'}">
+              ${device.isCurrent ? '● В сети' : '○ ' + device.lastActive}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div>
+        ${device.isCurrent
+          ? '<span style="font-size:11px;color:var(--muted);padding:4px 8px;">Активно</span>'
+          : `<button class="revoke-session-btn" data-revoke-id="${device.id}">Завершить сеанс</button>`}
+      </div>
+    `;
+
+    container.appendChild(el);
+  });
+
+  // Attach revoke click handlers
+  container.querySelectorAll("[data-revoke-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const devId = btn.dataset.revokeId;
+      revokeSession(devId);
+    });
+  });
+}
+
+function revokeSession(deviceId){
+  let devices = getStoredDevices();
+  const target = devices.find(d => d.id === deviceId);
+  const targetName = target?.model || "Устройство";
+
+  devices = devices.filter(d => d.id !== deviceId);
+  localStorage.setItem("mrfeast_active_devices", JSON.stringify(devices));
+
+  renderDevicesList();
+  showToast(`Сеанс на ${targetName} завершён`);
+}
+
+// Terminate all other sessions
+$("terminateOtherSessionsBtn").addEventListener("click", () => {
+  let devices = getStoredDevices();
+  const currentOnly = devices.filter(d => d.isCurrent);
+  localStorage.setItem("mrfeast_active_devices", JSON.stringify(currentOnly));
+  renderDevicesList();
+  showToast("Все остальные сеансы успешно завершены!");
+});
+
+// Logout
+$("logoutBtn").addEventListener("click", () => {
+  closeModal("profileModal");
+  localStorage.removeItem("mrfeast_bank_uid");
+  currentUser = null;
+  currentProfile = null;
+  showEntryStep();
+  authScreen.classList.remove("hidden");
+  showToast("Вы вышли из банковского профиля.");
+});
+
+// Clicking avatar on topbar opens Profile & Devices Modal
+$("avatar").addEventListener("click", () => {
+  updateProfileModalUI();
+  openModal("profileModal");
+});
+
+/* =========================================================
+   TRANSACTIONS
+========================================================= */
+
+async function loadTransactions(){
+  if(!currentUser) return;
+
+  const container = $("transactions");
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("transactions")
+      .select(`
+        id,
+        sender_id,
+        recipient_id,
+        amount,
+        description,
+        created_at,
+        sender:profiles!transactions_sender_id_fkey(
+          first_name,
+          last_name,
+          card_number
+        ),
+        recipient:profiles!transactions_recipient_id_fkey(
+          first_name,
+          last_name,
+          card_number
+        )
+      `)
+      .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false })
+      .limit(25);
+
+    if(error){
+      console.error(error);
+      container.innerHTML = `<div class="empty">Не удалось загрузить историю.</div>`;
+      return;
+    }
+
+    container.innerHTML = "";
+
+    if(!data?.length){
+      container.innerHTML = `<div class="empty">Операций пока нет.</div>`;
+      return;
+    }
+
+    data.forEach(tx => {
+      const incoming = tx.recipient_id === currentUser.id;
+      const person = incoming ? tx.sender : tx.recipient;
+      const name = person
+        ? [person.first_name, person.last_name].filter(Boolean).join(" ")
+        : "Пользователь";
+
+      const amount = Number(tx.amount);
+      const date = new Date(tx.created_at);
+      const formattedDate = date.toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      const row = document.createElement("div");
+      row.className = "tx";
+      row.innerHTML = `
+        <div class="tic">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            ${incoming
+              ? `<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>`
+              : `<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>`}
+          </svg>
+        </div>
+        <div class="info">
+          <div class="t">${incoming ? "Входящий перевод от" : "Перевод пользователю"} ${escapeHtml(name)}</div>
+          <div class="d">${formattedDate}${tx.description ? " • " + escapeHtml(tx.description) : ""}</div>
+        </div>
+        <div class="sum ${incoming ? "plus" : "minus"}">
+          ${incoming ? "+" : "−"}$${formatMoney(amount)}
+        </div>
+      `;
+
+      row.addEventListener("click", () => {
+        openTransactionDetails(tx, incoming, name);
+      });
+
+      container.appendChild(row);
+    });
+
+  } catch(e) {
+    console.error("loadTransactions exception:", e);
+    container.innerHTML = `<div class="empty">Ошибка загрузки операций.</div>`;
+  }
+}
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function openTransactionDetails(tx, incoming, name){
+  const amount = Number(tx.amount);
+  const date = new Date(tx.created_at);
+
+  const html = `
+    <div class="amount-large">
+      ${incoming ? "+" : "−"}$${formatMoney(amount)}
+    </div>
+    <div class="detail">
+      <div class="detail-row">
+        <span>Тип</span>
+        <span>${incoming ? "Входящий перевод" : "Исходящий перевод"}</span>
+      </div>
+      <div class="detail-row">
+        <span>${incoming ? "Отправитель" : "Получатель"}</span>
+        <span>${escapeHtml(name)}</span>
+      </div>
+      <div class="detail-row">
+        <span>Сумма</span>
+        <span>$${formatMoney(amount)}</span>
+      </div>
+      <div class="detail-row">
+        <span>Описание</span>
+        <span>${tx.description ? escapeHtml(tx.description) : "Без описания"}</span>
+      </div>
+      <div class="detail-row">
+        <span>Дата</span>
+        <span>${date.toLocaleString("ru-RU")}</span>
+      </div>
+      <div class="detail-row">
+        <span>ID операции</span>
+        <span style="font-size:10px;word-break:break-all">${tx.id}</span>
+      </div>
+    </div>
+  `;
+
+  $("transactionDetails").innerHTML = html;
+  $("transactionModal").classList.remove("hidden");
+}
+
+/* =========================================================
+   SEARCH RECIPIENT (STRICTLY BY ID)
+========================================================= */
+
+$("searchRecipientBtn").addEventListener("click", searchRecipient);
+
+$("recipientSearch").addEventListener("keydown", event => {
+  if(event.key === "Enter") searchRecipient();
+});
+
+async function searchRecipient(){
+  const query = $("recipientSearch").value.trim().toUpperCase();
+
+  if(!query){
+    showToast("Введите ID пользователя (например MFP-839210).", true);
+    return;
+  }
+
+  // Ensure user searches strictly by ID, not phone number!
+  if(/^\+?\d{8,}$/.test(query)){
+    showToast("Поиск по номеру телефона отключен. Введите персональный ID (например MFP-123456).", true);
+    return;
+  }
+
+  const result = $("recipientResult");
+  result.innerHTML = `<div class="empty">Поиск по ID: ${escapeHtml(query)}...</div>`;
+  $("transferFields").classList.add("hidden");
+  selectedRecipient = null;
+
+  try {
+    let formattedId = query;
+    if(!formattedId.startsWith("MFP-") && /^\d+$/.test(formattedId)){
+      formattedId = "MFP-" + formattedId;
+    }
+
+    // Direct lookup in profiles table by universal_id
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("id, first_name, last_name, avatar_data, card_number, universal_id, balance")
+      .or(`universal_id.eq.${formattedId},universal_id.ilike.%${query}%`)
+      .limit(1);
+
+    if(error) throw error;
+
+    let user = data?.[0];
+
+    // Fallback to RPC if direct select had no result
+    if(!user){
+      const { data: rpcData } = await supabaseClient.rpc("lookup_bank_user", { q: formattedId });
+      user = rpcData?.[0];
+    }
+
+    if(!user){
+      result.innerHTML = `<div class="empty">Пользователь с ID "${escapeHtml(query)}" не найден.</div>`;
+      return;
+    }
+
+    if(user.id === currentUser.id){
+      result.innerHTML = `<div class="empty">Нельзя выполнить перевод на свой собственный ID.</div>`;
+      return;
+    }
+
+    selectedRecipient = user;
+    const name = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Клиент банка";
+    const avatar = user.avatar_data
+      ? `<img src="${user.avatar_data}" alt="">`
+      : escapeHtml((user.first_name?.[0] || "M").toUpperCase());
+
+    result.innerHTML = `
+      <div class="receiver">
+        <div class="receiver-avatar">${avatar}</div>
+        <div class="receiver-info">
+          <div class="receiver-name">${escapeHtml(name)}</div>
+          <div class="receiver-meta">
+            ID: <b style="color:var(--gold-light);">${escapeHtml(user.universal_id || "—")}</b> • карта: ${maskCard(user.card_number)}
+          </div>
+        </div>
+      </div>
+    `;
+
+    $("transferFields").classList.remove("hidden");
+    $("transferAmount").focus();
+
+  } catch(error) {
+    console.error(error);
+    result.innerHTML = `<div class="empty">Ошибка поиска пользователя по ID.</div>`;
+  }
+}
+
+/* =========================================================
+   TRANSFER ACTION
+========================================================= */
+
+$("sendTransferBtn").addEventListener("click", async () => {
+  if(!selectedRecipient){
+    showToast("Сначала найдите получателя по ID.", true);
+    return;
+  }
+
+  const amount = Number($("transferAmount").value);
+  const description = $("transferDescription").value.trim();
+
+  if(!Number.isFinite(amount) || amount <= 0){
+    showToast("Введите корректную сумму.", true);
+    return;
+  }
+
+  if(amount > Number(currentProfile.balance)){
+    showToast("Недостаточно средств на балансе.", true);
+    return;
+  }
+
+  const button = $("sendTransferBtn");
+  const status = $("transferStatus");
+
+  button.disabled = true;
+  status.textContent = "Безопасно выполняем перевод...";
+
+  try {
+    const { data, error } = await supabaseClient.rpc("transfer_money", {
+      p_recipient: selectedRecipient.id,
+      p_amount: Number(amount.toFixed(2)),
+      p_description: description || null
+    });
+
+    if(error) throw error;
+
+    status.textContent = "Перевод успешно выполнен.";
+    showToast(`Переведено $${formatMoney(amount)}`);
+
+    // Native notification
+    const recipientName = [selectedRecipient.first_name, selectedRecipient.last_name].filter(Boolean).join(" ") || selectedRecipient.universal_id;
+    NativeBridge.showNotification(
+      "💸 Перевод выполнен",
+      `Списано $${formatMoney(amount)} в пользу ${recipientName}`,
+      false
+    );
+
+    await loadProfile();
+    renderBalance(currentProfile.balance, true);
+    await loadTransactions();
+
+    setTimeout(() => {
+      closeModal("transferModal");
+      $("recipientSearch").value = "";
+      $("transferAmount").value = "";
+      $("transferDescription").value = "";
+      $("recipientResult").innerHTML = "";
+      $("transferFields").classList.add("hidden");
+      selectedRecipient = null;
+      status.textContent = "";
+    }, 500);
+
+  } catch(error) {
+    console.error(error);
+    const msg = String(error.message || "");
+    if(msg.includes("insufficient_funds")){
+      status.textContent = "Недостаточно средств.";
+    } else {
+      status.textContent = "Перевод не выполнен.";
+    }
+    showToast(status.textContent, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id){ $(id).classList.remove("hidden"); }
+function closeModal(id){ $(id).classList.add("hidden"); }
+
+document.querySelectorAll("[data-close]").forEach(button => {
+  button.addEventListener("click", () => {
+    closeModal(button.dataset.close);
+  });
+});
+
+document.querySelectorAll(".modal").forEach(modal => {
+  modal.addEventListener("click", event => {
+    if(event.target === modal) modal.classList.add("hidden");
+  });
+});
+
+/* =========================================================
+   BUTTON ACTIONS
+========================================================= */
+
+$("transferBtn").addEventListener("click", () => {
+  openModal("transferModal");
+  setTimeout(() => $("recipientSearch").focus(), 100);
+});
+
+$("historyBtn").addEventListener("click", () => {
+  document.querySelector(".panel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+});
+
+$("depositBtn").addEventListener("click", async () => {
+  if(!currentProfile) return;
+  const bonus = 250.00;
+  const newBal = Number(currentProfile.balance) + bonus;
+
+  try {
+    await supabaseClient
+      .from("profiles")
+      .update({ balance: newBal })
+      .eq("id", currentProfile.id);
+
+    currentProfile.balance = newBal;
+    renderBalance(newBal, true);
+    showToast(`Баланс пополнен на $${formatMoney(bonus)}!`);
+    NativeBridge.showNotification(
+      "💰 Пополнение баланса",
+      `Зачислено +$${formatMoney(bonus)}. Новый баланс: $${formatMoney(newBal)}`,
+      true
+    );
+  } catch(e) {
+    showToast("Пополнение счета: $250.00");
+  }
+});
+
+$("payBtn").addEventListener("click", () => {
+  showToast("Оплата по QR и NFC активна.");
+});
+
+/* =========================================================
+   CARD FLIP
+========================================================= */
+
+(function(){
+  const scene = $("cardScene");
+  const card = $("card");
+  const flip = () => card.classList.toggle("flipped");
+  scene.addEventListener("click", flip);
+  scene.addEventListener("keydown", event => {
+    if(event.key === "Enter" || event.key === " "){
+      event.preventDefault();
+      flip();
+    }
+  });
+})();
+
+/* =========================================================
+   START BANK
+========================================================= */
+
+async function startBank(){
+  if(!currentProfile) await loadProfile();
+  if(!currentProfile) return;
+
+  renderAvatar(currentProfile);
+  renderCard(currentProfile);
+  renderBalance(currentProfile.balance, false);
+
+  await showWelcome(currentProfile);
+  await loadTransactions();
+
+  // Listen to realtime transaction updates for this user
+  try {
+    supabaseClient
+      .channel('public:transactions')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'transactions',
+        filter: `recipient_id=eq.${currentProfile.id}`
+      }, async (payload) => {
+        const tx = payload.new;
+        showToast(`Входящий перевод +$${formatMoney(tx.amount)}!`);
+        NativeBridge.showNotification(
+          "💰 Входящий перевод!",
+          `Вам перевели $${formatMoney(tx.amount)}. Баланс обновлен.`,
+          true
+        );
+        await loadProfile();
+        renderBalance(currentProfile.balance, true);
+        await loadTransactions();
+      })
+      .subscribe();
+  } catch(err) {
+    console.warn("Realtime subscription warning:", err);
+  }
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function init(){
+  const savedUid = localStorage.getItem("mrfeast_bank_uid");
+  if(savedUid){
+    currentUser = { id: savedUid };
+    try {
+      const p = await loadProfile();
+      if(p){
+        authScreen.classList.add("hidden");
+        await startBank();
+        return;
+      }
+    } catch(err){
+      console.warn("Init loadProfile error:", err);
+    }
+  }
+
+  showEntryStep();
+  authScreen.classList.remove("hidden");
+}
+
+init();
+
+</script>
+
+</body>
+</html>

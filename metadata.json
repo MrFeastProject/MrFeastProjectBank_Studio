@@ -1,0 +1,6 @@
+{
+  "name": "MrFeastProjectBank",
+  "description": "MrFeastProjectBank - мобильный банк с быстрой Google Authentication, push-уведомлениями FCM, автозапуском и фоновым сервисом для переводов.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
