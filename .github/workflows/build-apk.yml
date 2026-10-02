@@ -1,17 +1,17 @@
-name: Build Android APK
+name: Build and Release APK
 
 on:
   push:
     branches:
-      - "**"
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-apk:
-    name: Build APK
+    name: Build and Publish APK
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +29,20 @@ jobs:
         with:
           gradle-version: "9.3.1"
 
-      - name: Create debug keystore
+      - name: Create release version
+        id: version
+        shell: bash
+        run: |
+          VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))
+          VERSION_NAME="1.0.${GITHUB_RUN_NUMBER}"
+
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+
+          echo "Version Code: $VERSION_CODE"
+          echo "Version Name: $VERSION_NAME"
+
+      - name: Create temporary debug keystore
         run: |
           keytool -genkeypair \
             -v \
@@ -43,12 +56,25 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US"
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: |
+          gradle :app:assembleDebug \
+            -PciVersionCode=${{ steps.version.outputs.version_code }} \
+            -PciVersionName=${{ steps.version.outputs.version_name }} \
+            --stacktrace
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MrFeastProjectBank-debug-${{ github.sha }}
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 30
+      - name: Rename APK
+        run: |
+          cp app/build/outputs/apk/debug/*.apk \
+            "MrFeastProjectBank-${{ steps.version.outputs.version_name }}.apk"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.version.outputs.version_name }}"
+
+          gh release create "$TAG" \
+            "MrFeastProjectBank-${{ steps.version.outputs.version_name }}.apk" \
+            --title "MrFeastProject Bank ${{ steps.version.outputs.version_name }}" \
+            --generate-notes \
+            --latest
