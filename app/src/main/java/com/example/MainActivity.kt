@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.bridge.AndroidBankBridge
 import com.example.service.MrFeastBankForegroundService
@@ -45,10 +44,12 @@ import com.example.util.NotificationHelper
 
 class MainActivity : ComponentActivity() {
 
+    private var activeWebView: WebView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Force hardware acceleration at window level for smooth 2D/Vulkan rendering
+        // Force hardware acceleration at window level for ultra-smooth 2D rendering
         window.setFlags(
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
@@ -64,16 +65,28 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyApplicationTheme {
-                BankAppScreen()
+                BankAppScreen(
+                    onWebViewCreated = { webView ->
+                        activeWebView = webView
+                    }
+                )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Trigger real-time data sync immediately when returning to foreground
+        activeWebView?.evaluateJavascript(
+            "if(window.refreshBankRealtime) { window.refreshBankRealtime(); }",
+            null
+        )
     }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun BankAppScreen() {
-    val context = LocalContext.current
+fun BankAppScreen(onWebViewCreated: (WebView) -> Unit) {
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var canGoBack by remember { mutableStateOf(false) }
 
@@ -105,7 +118,7 @@ fun BankAppScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070707))
+            .background(Color(0xFF050505))
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -118,7 +131,7 @@ fun BankAppScreen() {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
-                    setBackgroundColor(android.graphics.Color.parseColor("#070707"))
+                    setBackgroundColor(android.graphics.Color.parseColor("#050505"))
 
                     // Force 2D hardware accelerated layer
                     setLayerType(View.LAYER_TYPE_HARDWARE, null)
@@ -134,14 +147,14 @@ fun BankAppScreen() {
                         cacheMode = WebSettings.LOAD_DEFAULT
                         mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-                        // Optimization settings for high-performance 2D rendering
+                        // High performance rendering settings
                         offscreenPreRaster = true
                         @Suppress("DEPRECATION")
                         setRenderPriority(WebSettings.RenderPriority.HIGH)
                     }
 
                     // Attach Native Javascript Interface Bridge
-                    addJavascriptInterface(AndroidBankBridge(ctx), "AndroidBankBridge")
+                    addJavascriptInterface(AndroidBankBridge(ctx) { this }, "AndroidBankBridge")
 
                     webViewClient = object : WebViewClient() {
                         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -181,10 +194,12 @@ fun BankAppScreen() {
 
                     loadUrl("file:///android_asset/bank_web/index.html")
                     webViewInstance = this
+                    onWebViewCreated(this)
                 }
             },
             update = { webView ->
                 webViewInstance = webView
+                onWebViewCreated(webView)
             }
         )
     }

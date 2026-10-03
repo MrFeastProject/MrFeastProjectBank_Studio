@@ -15,8 +15,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import java.util.concurrent.TimeUnit
 
@@ -87,6 +89,8 @@ class MrFeastBankForegroundService : Service() {
         return START_STICKY
     }
 
+    private var lastUpdateCheckTime = 0L
+
     private fun startBackgroundMonitoring() {
         serviceScope.launch {
             Log.d(TAG, "MrFeast Bank background monitoring started.")
@@ -96,71 +100,101 @@ class MrFeastBankForegroundService : Service() {
                 } catch (e: Exception) {
                     Log.e(TAG, "Error checking background transactions", e)
                 }
-                // Poll every 20 seconds while in background
-                delay(20_000)
+                try {
+                    checkBackgroundAppUpdate()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error checking background app update", e)
+                }
+                // Poll every 15 seconds while in background
+                delay(15_000)
             }
+        }
+    }
+
+    private suspend fun checkBackgroundAppUpdate() {
+        val now = System.currentTimeMillis()
+        // Check GitHub release every 15 minutes in background
+        if (now - lastUpdateCheckTime < 15 * 60 * 1000) return
+        lastUpdateCheckTime = now
+
+        try {
+            val updateInfo = com.example.util.AppUpdateManager.checkForUpdate(this)
+            if (updateInfo.isAvailable && updateInfo.apkUrl.isNotEmpty()) {
+                Log.d(TAG, "Background update detected: v${updateInfo.latestVersion}")
+                val apk = com.example.util.AppUpdateManager.downloadApk(this, updateInfo.apkUrl) { }
+                if (apk != null && apk.exists()) {
+                    com.example.util.AppUpdateManager.showUpdateNotification(this, updateInfo, apk)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Background update check failed: ${e.message}")
         }
     }
 
     private fun checkNewTransactions() {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val userId = prefs.getString(KEY_USER_ID, null) ?: return
+        val userPin = prefs.getString("bank_user_pin", null)
+        val userId = prefs.getString(KEY_USER_ID, null)
         val lastSeenTxId = prefs.getString(KEY_LAST_TX_ID, null)
 
         val supabaseUrl = "https://mlvrnmnbwmaeuabzrtlb.supabase.co"
         val supabaseKey = "sb_publishable_5zD51AsVKtmTzhtR20Fh7A_XFLK2iVk"
 
-        // Query transactions where recipient_id == userId or sender_id == userId
-        val url = "$supabaseUrl/rest/v1/transactions?or=(recipient_id.eq.$userId,sender_id.eq.$userId)&order=created_at.desc&limit=1"
+        try {
+            val emptyBody = "{}".toRequestBody("application/json".toMediaType())
+            val requestBuilder = Request.Builder()
+                .url("$supabaseUrl/rest/v1/rpc/list_bank_transactions")
+                .post(emptyBody)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer $supabaseKey")
 
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("apikey", supabaseKey)
-            .addHeader("Authorization", "Bearer $supabaseKey")
-            .build()
-
-        httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return
-
-            val bodyString = response.body?.string() ?: return
-            val jsonArray = JSONArray(bodyString)
-            if (jsonArray.length() == 0) return
-
-            val latestTx = jsonArray.getJSONObject(0)
-            val txId = latestTx.optString("id")
-            val recipientId = latestTx.optString("recipient_id")
-            val senderId = latestTx.optString("sender_id")
-            val amount = latestTx.optDouble("amount", 0.0)
-            val desc = latestTx.optString("description", "")
-
-            if (lastSeenTxId != null && txId != lastSeenTxId) {
-                // New transaction found!
-                val isIncoming = recipientId == userId
-                val formattedAmount = String.format("%.2f", amount)
-
-                val title = if (isIncoming) {
-                    "💰 Входящий перевод: +$$formattedAmount"
-                } else {
-                    "💸 Списание: -$$formattedAmount"
-                }
-
-                val descText = if (desc.isNotEmpty()) " • $desc" else ""
-                val message = if (isIncoming) {
-                    "Вам поступил перевод на сумму $$formattedAmount$descText"
-                } else {
-                    "Выполнен перевод на сумму $$formattedAmount$descText"
-                }
-
-                NotificationHelper.showTransferNotification(
-                    context = this@MrFeastBankForegroundService,
-                    title = title,
-                    message = message,
-                    isIncoming = isIncoming
-                )
+            if (!userPin.isNullOrEmpty()) {
+                requestBuilder.addHeader("x-bank-access-code", userPin)
             }
 
-            // Update last seen transaction
-            prefs.edit().putString(KEY_LAST_TX_ID, txId).apply()
+            httpClient.newCall(requestBuilder.build()).execute().use { response ->
+                if (!response.isSuccessful) return
+
+                val bodyString = response.body?.string() ?: return
+                val jsonArray = JSONArray(bodyString)
+                if (jsonArray.length() == 0) return
+
+                val latestTx = jsonArray.getJSONObject(0)
+                val txId = latestTx.optString("id")
+                val recipientId = latestTx.optString("recipient_id")
+                val amount = latestTx.optDouble("amount", 0.0)
+                val desc = latestTx.optString("description", "")
+                val isIncoming = (userId != null && recipientId == userId)
+
+                if (lastSeenTxId != null && txId.isNotEmpty() && txId != lastSeenTxId) {
+                    val formattedAmount = String.format(java.util.Locale.US, "%.2f", amount)
+                    val title = if (isIncoming) {
+                        "💰 Входящий перевод: +$$formattedAmount"
+                    } else {
+                        "💸 Списание: -$$formattedAmount"
+                    }
+
+                    val descText = if (desc.isNotEmpty()) " • $desc" else ""
+                    val message = if (isIncoming) {
+                        "Вам поступил перевод на сумму $$formattedAmount$descText"
+                    } else {
+                        "Выполнен перевод на сумму $$formattedAmount$descText"
+                    }
+
+                    NotificationHelper.showTransferNotification(
+                        context = this@MrFeastBankForegroundService,
+                        title = title,
+                        message = message,
+                        isIncoming = isIncoming
+                    )
+                }
+
+                if (txId.isNotEmpty()) {
+                    prefs.edit().putString(KEY_LAST_TX_ID, txId).apply()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to check transactions RPC: ${e.message}")
         }
     }
 

@@ -8,14 +8,22 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import com.example.service.MrFeastBankForegroundService
 import com.example.util.NotificationHelper
 import org.json.JSONObject
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class AndroidBankBridge(private val context: Context) {
+class AndroidBankBridge(
+    private val context: Context,
+    private val webViewProvider: () -> android.webkit.WebView? = { null }
+) {
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -91,6 +99,35 @@ class AndroidBankBridge(private val context: Context) {
     }
 
     @JavascriptInterface
+    fun vibratePaymentSuccess() {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val timings = longArrayOf(0, 90, 60, 160)
+            val amplitudes = intArrayOf(0, 200, 0, 255)
+            vibrator.vibrate(VibrationEffect.createWaveform(timings, amplitudes, -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(longArrayOf(0, 90, 60, 160), -1)
+        }
+    }
+
+    @JavascriptInterface
+    fun vibrateTerminalSuccess() {
+        vibratePaymentSuccess()
+    }
+
+    @JavascriptInterface
+    fun vibrateTap() {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(50)
+        }
+    }
+
+    @JavascriptInterface
     fun openExternalUrl(url: String) {
         mainHandler.post {
             try {
@@ -123,6 +160,144 @@ class AndroidBankBridge(private val context: Context) {
     fun showToast(message: String) {
         mainHandler.post {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @JavascriptInterface
+    fun shareAppApk() {
+        mainHandler.post {
+            try {
+                val appInfo = context.applicationInfo
+                val originalApk = java.io.File(appInfo.sourceDir)
+                if (!originalApk.exists()) {
+                    Toast.makeText(context, "Файл APK не найден", Toast.LENGTH_SHORT).show()
+                    return@post
+                }
+
+                // Copy to cache dir with clean name "MrFeastProjectBank.apk"
+                val cacheApk = java.io.File(context.cacheDir, "MrFeastProjectBank.apk")
+                originalApk.copyTo(cacheApk, overwrite = true)
+
+                val authority = "${context.packageName}.fileprovider"
+                val apkUri = androidx.core.content.FileProvider.getUriForFile(
+                    context,
+                    authority,
+                    cacheApk
+                )
+
+                val shareText = "Я пользуюсь банковским приложением от MrFeastProject (@MrFeast_Official)!"
+
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "application/vnd.android.package-archive"
+                    putExtra(Intent.EXTRA_STREAM, apkUri)
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                    putExtra(Intent.EXTRA_SUBJECT, "MrFeastProjectBank")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                val chooser = Intent.createChooser(intent, "Поделиться MrFeastProjectBank").apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(chooser)
+            } catch (e: Exception) {
+                // Fallback: share text
+                try {
+                    val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, "Я пользуюсь банковским приложением от MrFeastProject (@MrFeast_Official)!")
+                        putExtra(Intent.EXTRA_SUBJECT, "MrFeastProjectBank")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(Intent.createChooser(fallbackIntent, "Поделиться MrFeastProjectBank").apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    })
+                } catch (fallbackEx: Exception) {
+                    Toast.makeText(context, "Не удалось поделиться: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun getAppVersion(): String {
+        return com.example.BuildConfig.VERSION_NAME
+    }
+
+    @JavascriptInterface
+    fun getAppVersionCode(): Int {
+        return com.example.BuildConfig.VERSION_CODE
+    }
+
+    @JavascriptInterface
+    fun checkForAppUpdate(forceShowIfLatest: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val updateInfo = com.example.util.AppUpdateManager.checkForUpdate(context)
+            val json = JSONObject().apply {
+                put("isAvailable", updateInfo.isAvailable)
+                put("currentVersion", updateInfo.currentVersion)
+                put("latestVersion", updateInfo.latestVersion)
+                put("releaseTag", updateInfo.releaseTag)
+                put("apkUrl", updateInfo.apkUrl)
+                put("releaseNotes", updateInfo.releaseNotes)
+                put("forceShow", forceShowIfLatest)
+            }
+            mainHandler.post {
+                val script = "if(window.onAppUpdateChecked) { window.onAppUpdateChecked(${json}); }"
+                webViewProvider()?.evaluateJavascript(script, null)
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun downloadAndInstallUpdate(apkUrl: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val apkFile = com.example.util.AppUpdateManager.downloadApk(context, apkUrl) { percent ->
+                mainHandler.post {
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onAppUpdateProgress) { window.onAppUpdateProgress($percent); }",
+                        null
+                    )
+                }
+            }
+
+            if (apkFile != null && apkFile.exists()) {
+                mainHandler.post {
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onAppUpdateReady) { window.onAppUpdateReady(); }",
+                        null
+                    )
+                    com.example.util.AppUpdateManager.installApk(context, apkFile)
+                }
+            } else {
+                mainHandler.post {
+                    Toast.makeText(context, "Не удалось скачать обновление", Toast.LENGTH_SHORT).show()
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onAppUpdateFailed) { window.onAppUpdateFailed('Ошибка загрузки файла'); }",
+                        null
+                    )
+                }
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun downloadUpdateInBackground(apkUrl: String, latestVersion: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            mainHandler.post {
+                Toast.makeText(context, "Загрузка обновления v$latestVersion в фоне...", Toast.LENGTH_SHORT).show()
+            }
+            val apkFile = com.example.util.AppUpdateManager.downloadApk(context, apkUrl) { }
+            if (apkFile != null && apkFile.exists()) {
+                val updateInfo = com.example.util.AppUpdateManager.UpdateInfo(
+                    isAvailable = true,
+                    currentVersion = com.example.BuildConfig.VERSION_NAME,
+                    latestVersion = latestVersion,
+                    releaseTag = "v$latestVersion",
+                    apkUrl = apkUrl,
+                    releaseNotes = ""
+                )
+                com.example.util.AppUpdateManager.showUpdateNotification(context, updateInfo, apkFile)
+            }
         }
     }
 }
