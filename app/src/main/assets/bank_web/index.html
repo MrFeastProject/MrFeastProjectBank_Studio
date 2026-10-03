@@ -504,6 +504,34 @@ button{
   box-shadow:0 0 0 2px var(--gold-light);
 }
 
+.topbar-icon-btn{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:rgba(212,175,55,.08);
+  border:1px solid rgba(212,175,55,.25);
+  color:var(--gold);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  transition:all .18s ease;
+  min-width:48px;
+  min-height:48px;
+  padding:0;
+}
+
+.topbar-icon-btn:hover{
+  background:rgba(212,175,55,.2);
+  border-color:var(--gold);
+  transform:scale(1.05);
+}
+
+.topbar-icon-btn svg{
+  width:18px;
+  height:18px;
+  stroke:var(--gold);
+}
+
 .avatar img{
   width:100%;
   height:100%;
@@ -1400,6 +1428,348 @@ main{
 
 .revoke-session-btn:hover{
   background:rgba(255,104,104,.2);
+}
+
+/* ================= PROFILE SECTIONS & AUTO-UPDATE ================= */
+
+.profile-section-card{
+  margin-top:16px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(212,175,55,.18);
+  border-radius:18px;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.profile-section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.profile-section-title{
+  font-size:13px;
+  font-weight:700;
+  color:#f1f5f9;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  letter-spacing:.3px;
+}
+
+.badge-chip{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:12px;
+  background:rgba(212,175,55,.15);
+  border:1px solid rgba(212,175,55,.3);
+  color:var(--gold);
+}
+
+.profile-section-hint{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.45;
+}
+
+.share-app-action-btn{
+  margin-top:2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:13px;
+  width:100%;
+}
+
+.share-app-action-btn svg{
+  width:18px;
+  height:18px;
+  stroke:currentColor;
+}
+
+.update-perm-box{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
+  gap:10px;
+  transition:border-color .2s, background .2s;
+}
+
+.update-perm-box.perm-granted{
+  border-color:rgba(95,207,128,.35);
+  background:rgba(95,207,128,.05);
+}
+
+.update-perm-box.perm-needed{
+  border-color:rgba(255,183,77,.4);
+  background:rgba(255,183,77,.06);
+}
+
+.update-perm-text-col{
+  min-width:0;
+  flex:1;
+}
+
+.update-perm-status{
+  font-size:13px;
+  font-weight:700;
+  color:#f1f5f9;
+}
+
+.update-perm-box.perm-granted .update-perm-status{
+  color:var(--green);
+}
+
+.update-perm-box.perm-needed .update-perm-status{
+  color:#ffb74d;
+}
+
+.update-perm-subtext{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.perm-btn{
+  flex:none;
+  padding:7px 12px;
+  border-radius:10px;
+  border:1px solid rgba(212,175,55,.4);
+  background:rgba(212,175,55,.12);
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .18s;
+  white-space:nowrap;
+  min-height:36px;
+}
+
+.perm-btn:hover{
+  background:rgba(212,175,55,.25);
+  border-color:var(--gold);
+}
+
+.setting-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 4px;
+  gap:12px;
+}
+
+.toggle-title{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.toggle-desc{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.switch-ui{
+  position:relative;
+  display:inline-block;
+  width:46px;
+  height:26px;
+  flex:none;
+}
+
+.switch-ui input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.switch-slider{
+  position:absolute;
+  cursor:pointer;
+  top:0;left:0;right:0;bottom:0;
+  background:#262626;
+  border:1px solid rgba(255,255,255,.15);
+  transition:.25s;
+  border-radius:26px;
+}
+
+.switch-slider:before{
+  position:absolute;
+  content:"";
+  height:18px;
+  width:18px;
+  left:3px;
+  bottom:3px;
+  background:#a1a1aa;
+  transition:.25s;
+  border-radius:50%;
+}
+
+.switch-ui input:checked + .switch-slider{
+  background:linear-gradient(135deg,rgba(212,175,55,.35),rgba(255,215,0,.45));
+  border-color:var(--gold);
+}
+
+.switch-ui input:checked + .switch-slider:before{
+  transform:translateX(20px);
+  background:var(--gold);
+  box-shadow:0 0 10px rgba(212,175,55,.6);
+}
+
+.check-update-btn{
+  margin-top:4px;
+  font-size:12px;
+  padding:10px 14px;
+  width:100%;
+}
+
+/* ================= UPDATE MODAL ================= */
+
+.app-update-body{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.update-version-hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:14px 10px;
+  background:rgba(212,175,55,.05);
+  border:1px solid rgba(212,175,55,.2);
+  border-radius:16px;
+}
+
+.ver-badge{
+  font-size:13px;
+  font-weight:700;
+  padding:4px 12px;
+  border-radius:12px;
+}
+
+.current-ver{
+  background:rgba(255,255,255,.07);
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+.ver-arrow{
+  color:var(--gold);
+  font-size:16px;
+}
+
+.latest-ver{
+  background:rgba(95,207,128,.15);
+  color:var(--green);
+  border:1px solid rgba(95,207,128,.4);
+}
+
+.update-notes-box{
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;
+  padding:12px 14px;
+}
+
+.update-notes-title{
+  font-size:12px;
+  font-weight:700;
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  margin-bottom:6px;
+}
+
+.update-notes-text{
+  font-size:13px;
+  color:var(--text);
+  line-height:1.5;
+  white-space:pre-line;
+}
+
+.perm-warning-banner{
+  background:rgba(255,183,77,.1);
+  border:1px solid rgba(255,183,77,.35);
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:12px;
+  color:#ffcc80;
+  line-height:1.45;
+}
+
+.update-progress-container{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:6px;
+}
+
+.update-progress-bar{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,.08);
+  border-radius:6px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.update-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold),#ffe082);
+  box-shadow:0 0 10px rgba(212,175,55,.5);
+  transition:width .2s ease;
+}
+
+.update-progress-label{
+  font-size:12px;
+  color:var(--gold);
+  font-weight:600;
+  text-align:center;
+}
+
+.update-auto-close-hint{
+  font-size:12px;
+  color:var(--green);
+  font-weight:700;
+  text-align:center;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(95,207,128,.1);
+  border:1px solid rgba(95,207,128,.25);
+  animation:pulseGreen 1.5s infinite;
+}
+
+@keyframes pulseGreen{
+  0%,100%{opacity:1}
+  50%{opacity:.6}
+}
+
+.gold-btn-sm{
+  border:none;
+  border-radius:10px;
+  padding:8px 14px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold-deep));
+  color:#111;
+  transition:transform .15s,box-shadow .15s;
+}
+
+.gold-btn-sm:hover{
+  transform:scale(1.02);
+  box-shadow:0 0 12px rgba(212,175,55,.4);
 }
 
 /* ================= TOAST ================= */
@@ -2348,6 +2718,12 @@ body.modal-open{
   </div>
 
   <div class="top-actions">
+    <button class="topbar-icon-btn" id="shareAppTopBtn" title="Поделиться приложением" aria-label="Поделиться приложением">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
     <div class="status-badge" title="Статус банковской системы">
       <div class="status-dot"></div>
       <span>Онлайн</span>
@@ -2740,6 +3116,77 @@ body.modal-open{
       </div>
     </div>
 
+    <!-- SHARE APP SECTION -->
+    <div class="profile-section-card">
+      <div class="profile-section-header">
+        <div class="profile-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:var(--gold);">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span>Поделиться приложением</span>
+        </div>
+        <span class="badge-chip">APK</span>
+      </div>
+      <div class="profile-section-hint">
+        Отправьте APK файл приложения MrFeastProjectBank друзьям в Telegram, WhatsApp или по Bluetooth.
+      </div>
+      <button class="gold-btn share-app-action-btn" id="shareAppProfileBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <span>Поделиться приложением (APK)</span>
+      </button>
+    </div>
+
+    <!-- AUTO-UPDATE & SECURITY SECTION -->
+    <div class="profile-section-card" id="autoUpdateSection">
+      <div class="profile-section-header">
+        <div class="profile-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke:var(--gold);">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 21h5v-5"/>
+          </svg>
+          <span>Автообновление банка</span>
+        </div>
+        <span class="badge-chip" id="profileAppVerBadge">v1.0.5</span>
+      </div>
+
+      <div class="profile-section-hint">
+        Приложение может самостоятельно в фоне проверять новые версии и обновляться. Для этого необходимо выдать разрешение в настройках Android.
+      </div>
+
+      <!-- Permission Status Box -->
+      <div class="update-perm-box" id="updatePermBox">
+        <div class="update-perm-text-col">
+          <div class="update-perm-status" id="updatePermStatusText">Проверка разрешений...</div>
+          <div class="update-perm-subtext" id="updatePermSubtext">Разрешение «Установка неизвестных приложений»</div>
+        </div>
+        <button class="perm-btn" id="openSettingsPermBtn">
+          Настроить
+        </button>
+      </div>
+
+      <!-- Background toggle -->
+      <div class="setting-toggle-row">
+        <div>
+          <div class="toggle-title">Фоновое автообновление</div>
+          <div class="toggle-desc">Автоматически скачивать и обновлять банк</div>
+        </div>
+        <label class="switch-ui">
+          <input type="checkbox" id="autoUpdateCheckbox" checked>
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <button class="secondary-btn check-update-btn" id="checkUpdateManualBtn">
+        🔄 Проверить наличие обновлений
+      </button>
+    </div>
+
     <!-- DEVICES SECTION (REALTIME CONNECTED DEVICES) -->
     <div class="devices-section">
 
@@ -2760,6 +3207,64 @@ body.modal-open{
         Выйти из профиля
       </button>
 
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= APP UPDATE MODAL ================= -->
+
+<div class="modal hidden" id="appUpdateModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <h3 id="appUpdateModalTitle">🚀 Доступно обновление</h3>
+      <button class="close" data-close="appUpdateModal">×</button>
+    </div>
+
+    <div class="app-update-body">
+      <div class="update-version-hero">
+        <span class="ver-badge current-ver" id="modalCurVer">v1.0.5</span>
+        <span class="ver-arrow">➜</span>
+        <span class="ver-badge latest-ver" id="modalNewVer">v1.0.6</span>
+      </div>
+
+      <div class="update-notes-box">
+        <div class="update-notes-title">Что нового в этом выпуске:</div>
+        <div class="update-notes-text" id="modalUpdateNotes">
+          Регулярное обновление безопасности и производительности банка.
+        </div>
+      </div>
+
+      <!-- Permission Warning if needed -->
+      <div class="perm-warning-banner hidden" id="modalPermWarning">
+        ⚠️ <b>Внимание:</b> для завершения обновления предоставьте приложению право «Установка неизвестных приложений» в настройках Android.
+        <button class="gold-btn-sm" id="modalGrantPermBtn" style="margin-top:8px;width:100%;">
+          Открыть настройки устройства
+        </button>
+      </div>
+
+      <!-- Download progress -->
+      <div class="update-progress-container hidden" id="modalProgressContainer">
+        <div class="update-progress-bar">
+          <div class="update-progress-fill" id="modalProgressFill" style="width:0%"></div>
+        </div>
+        <div class="update-progress-label" id="modalProgressLabel">Загрузка: 0%</div>
+        <div class="update-auto-close-hint hidden" id="modalAutoCloseHint">
+          🚀 Обновление загружено! Приложение закрывается и обновляется...
+        </div>
+      </div>
+
+      <div class="update-dialog-actions" id="modalUpdateActions">
+        <button class="gold-btn" id="confirmUpdateBtn">
+          Обновить сейчас
+        </button>
+        <button class="secondary-btn" id="dismissUpdateBtn" style="margin-top:8px;">
+          Напомнить позже
+        </button>
+      </div>
     </div>
 
   </div>
@@ -3004,6 +3509,66 @@ const NativeBridge = {
       window.AndroidBankBridge.copyToClipboard(text);
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
+    }
+  },
+  shareAppApk() {
+    if (this.isAvailable() && window.AndroidBankBridge.shareAppApk) {
+      window.AndroidBankBridge.shareAppApk();
+    } else {
+      if (navigator.share) {
+        navigator.share({
+          title: "MrFeastProjectBank",
+          text: "Скачивай официальное банковское приложение MrFeastProjectBank!",
+          url: "https://github.com/MrFeastProject/MrFeastProjectBank_Studio/releases/latest"
+        }).catch(() => {});
+      } else {
+        this.copyToClipboard("https://github.com/MrFeastProject/MrFeastProjectBank_Studio/releases/latest");
+        showToast("Ссылка на приложение скопирована!");
+      }
+    }
+  },
+  canRequestPackageInstalls() {
+    if (this.isAvailable() && window.AndroidBankBridge.canRequestPackageInstalls) {
+      return Boolean(window.AndroidBankBridge.canRequestPackageInstalls());
+    }
+    return true;
+  },
+  openInstallPermissionSettings() {
+    if (this.isAvailable() && window.AndroidBankBridge.openInstallPermissionSettings) {
+      window.AndroidBankBridge.openInstallPermissionSettings();
+    } else {
+      showToast("Настройки разрешений доступны только в Android приложении");
+    }
+  },
+  isAutoUpdateEnabled() {
+    if (this.isAvailable() && window.AndroidBankBridge.isAutoUpdateEnabled) {
+      return Boolean(window.AndroidBankBridge.isAutoUpdateEnabled());
+    }
+    return true;
+  },
+  setAutoUpdateEnabled(enabled) {
+    if (this.isAvailable() && window.AndroidBankBridge.setAutoUpdateEnabled) {
+      window.AndroidBankBridge.setAutoUpdateEnabled(Boolean(enabled));
+    }
+  },
+  getAppVersion() {
+    if (this.isAvailable() && window.AndroidBankBridge.getAppVersion) {
+      return window.AndroidBankBridge.getAppVersion();
+    }
+    return "1.0.5";
+  },
+  checkForAppUpdate(forceShowIfLatest = false) {
+    if (this.isAvailable() && window.AndroidBankBridge.checkForAppUpdate) {
+      window.AndroidBankBridge.checkForAppUpdate(Boolean(forceShowIfLatest));
+    } else {
+      showToast("Проверка обновлений доступна на Android устройстве");
+    }
+  },
+  downloadAndInstallUpdate(apkUrl) {
+    if (this.isAvailable() && window.AndroidBankBridge.downloadAndInstallUpdate) {
+      window.AndroidBankBridge.downloadAndInstallUpdate(apkUrl);
+    } else {
+      showToast("Загрузка обновления доступна только на Android устройстве");
     }
   }
 };
@@ -3477,6 +4042,15 @@ function updateProfileModalUI(){
   isPinVisible = false;
   updatePinDisplayState();
 
+  // App version badge and auto-update status
+  if($("profileAppVerBadge")){
+    $("profileAppVerBadge").textContent = "v" + NativeBridge.getAppVersion();
+  }
+  if($("autoUpdateCheckbox")){
+    $("autoUpdateCheckbox").checked = NativeBridge.isAutoUpdateEnabled();
+  }
+  updateInstallPermissionCardUI();
+
   renderDevicesList();
 }
 
@@ -3632,6 +4206,166 @@ $("terminateOtherSessionsBtn").addEventListener("click", () => {
   showToast("Других устройств с активным сеансом нет.");
 });
 
+/* =========================================================
+   APP SHARING & AUTO-UPDATE MANAGEMENT
+========================================================= */
+
+// Update permission card status in profile modal
+function updateInstallPermissionCardUI(){
+  const box = $("updatePermBox");
+  if(!box) return;
+
+  const canInstall = NativeBridge.canRequestPackageInstalls();
+  const statusText = $("updatePermStatusText");
+  const subtext = $("updatePermSubtext");
+  const btn = $("openSettingsPermBtn");
+
+  if(canInstall){
+    box.className = "update-perm-box perm-granted";
+    if(statusText) statusText.textContent = "✅ Разрешение выдано";
+    if(subtext) subtext.textContent = "Банк может автоматически обновляться в фоне";
+    if(btn) btn.textContent = "Настройки";
+  } else {
+    box.className = "update-perm-box perm-needed";
+    if(statusText) statusText.textContent = "⚠️ Требуется разрешение";
+    if(subtext) subtext.textContent = "Нажмите для включения автообновления в настройках телефона";
+    if(btn) btn.textContent = "Выдать доступ";
+  }
+}
+
+// 1. SHARE APP HANDLERS
+if($("shareAppTopBtn")){
+  $("shareAppTopBtn").addEventListener("click", () => {
+    NativeBridge.shareAppApk();
+  });
+}
+
+if($("shareAppProfileBtn")){
+  $("shareAppProfileBtn").addEventListener("click", () => {
+    NativeBridge.shareAppApk();
+  });
+}
+
+// 2. AUTO-UPDATE PERMISSION & TOGGLE HANDLERS
+if($("openSettingsPermBtn")){
+  $("openSettingsPermBtn").addEventListener("click", () => {
+    NativeBridge.openInstallPermissionSettings();
+  });
+}
+
+if($("modalGrantPermBtn")){
+  $("modalGrantPermBtn").addEventListener("click", () => {
+    NativeBridge.openInstallPermissionSettings();
+  });
+}
+
+if($("autoUpdateCheckbox")){
+  $("autoUpdateCheckbox").addEventListener("change", (e) => {
+    const isChecked = e.target.checked;
+    NativeBridge.setAutoUpdateEnabled(isChecked);
+    showToast(isChecked ? "Фоновое автообновление включено" : "Фоновое автообновление выключено");
+  });
+}
+
+if($("checkUpdateManualBtn")){
+  $("checkUpdateManualBtn").addEventListener("click", () => {
+    showToast("Проверка обновлений банка...");
+    NativeBridge.checkForAppUpdate(true);
+  });
+}
+
+// 3. APP UPDATE MODAL & SYSTEM EVENT CALLBACKS
+let currentUpdateInfo = null;
+
+window.onInstallPermissionChanged = function(){
+  updateInstallPermissionCardUI();
+  if(currentUpdateInfo && $("modalPermWarning")){
+    const canInstall = NativeBridge.canRequestPackageInstalls();
+    $("modalPermWarning").classList.toggle("hidden", canInstall);
+  }
+};
+
+window.onAppUpdateChecked = function(data){
+  currentUpdateInfo = data;
+  if(data.isAvailable){
+    if($("modalCurVer")) $("modalCurVer").textContent = "v" + data.currentVersion;
+    if($("modalNewVer")) $("modalNewVer").textContent = "v" + data.latestVersion;
+    if($("modalUpdateNotes")){
+      $("modalUpdateNotes").textContent = data.releaseNotes || "Регулярное обновление безопасности и быстродействия.";
+    }
+
+    const canInstall = NativeBridge.canRequestPackageInstalls();
+    if($("modalPermWarning")){
+      $("modalPermWarning").classList.toggle("hidden", canInstall);
+    }
+
+    if($("modalProgressContainer")) $("modalProgressContainer").classList.add("hidden");
+    if($("modalAutoCloseHint")) $("modalAutoCloseHint").classList.add("hidden");
+    if($("modalProgressFill")) $("modalProgressFill").style.width = "0%";
+    if($("modalProgressLabel")) $("modalProgressLabel").textContent = "Загрузка: 0%";
+    if($("confirmUpdateBtn")){
+      $("confirmUpdateBtn").disabled = false;
+      $("confirmUpdateBtn").textContent = "Обновить сейчас";
+    }
+    if($("modalUpdateActions")) $("modalUpdateActions").classList.remove("hidden");
+
+    openModal("appUpdateModal");
+  } else if(data.forceShow){
+    showToast(`У вас установлена последняя версия v${data.currentVersion}`);
+  }
+};
+
+if($("confirmUpdateBtn")){
+  $("confirmUpdateBtn").addEventListener("click", () => {
+    if(!currentUpdateInfo || !currentUpdateInfo.apkUrl){
+      showToast("Ссылка на файл обновления не найдена", true);
+      return;
+    }
+
+    const canInstall = NativeBridge.canRequestPackageInstalls();
+    if(!canInstall){
+      NativeBridge.openInstallPermissionSettings();
+      showToast("Сначала выдайте разрешение «Установка неизвестных приложений» в настройках", true);
+      return;
+    }
+
+    $("confirmUpdateBtn").disabled = true;
+    if($("modalProgressContainer")) $("modalProgressContainer").classList.remove("hidden");
+    if($("modalProgressLabel")) $("modalProgressLabel").textContent = "Загрузка обновления: 0%...";
+    NativeBridge.downloadAndInstallUpdate(currentUpdateInfo.apkUrl);
+  });
+}
+
+if($("dismissUpdateBtn")){
+  $("dismissUpdateBtn").addEventListener("click", () => {
+    closeModal("appUpdateModal");
+  });
+}
+
+window.onAppUpdateProgress = function(percent){
+  if($("modalProgressContainer")) $("modalProgressContainer").classList.remove("hidden");
+  if($("modalProgressFill")) $("modalProgressFill").style.width = percent + "%";
+  if($("modalProgressLabel")) $("modalProgressLabel").textContent = `Загрузка обновления: ${percent}%`;
+};
+
+window.onAppUpdateReady = function(){
+  if($("modalProgressFill")) $("modalProgressFill").style.width = "100%";
+  if($("modalProgressLabel")) $("modalProgressLabel").textContent = "Загрузка завершена!";
+  if($("modalAutoCloseHint")) $("modalAutoCloseHint").classList.remove("hidden");
+  if($("modalUpdateActions")) $("modalUpdateActions").classList.add("hidden");
+  showToast("Запуск обновления! Приложение сейчас закроется...");
+};
+
+window.onAppUpdateFailed = function(err){
+  if($("confirmUpdateBtn")){
+    $("confirmUpdateBtn").disabled = false;
+    $("confirmUpdateBtn").textContent = "Попробовать снова";
+  }
+  if($("modalProgressLabel")){
+    $("modalProgressLabel").textContent = "Ошибка загрузки: " + (err || "Проверьте интернет");
+  }
+  showToast("Не удалось скачать обновление. Проверьте соединение с интернетом.", true);
+};
 
 /* ================= LOGOUT ================= */
 $("logoutBtn").addEventListener("click", async () => {

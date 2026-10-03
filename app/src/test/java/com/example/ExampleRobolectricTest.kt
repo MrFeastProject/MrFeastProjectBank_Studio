@@ -28,4 +28,19 @@ class ExampleRobolectricTest {
         val notification = NotificationHelper.buildForegroundNotification(context)
         assertNotNull(notification)
     }
+
+    @Test
+    fun `app update version comparison test`() {
+        org.junit.Assert.assertTrue(com.example.util.AppUpdateManager.isVersionGreater("1.0.6", "1.0.5"))
+        org.junit.Assert.assertTrue(com.example.util.AppUpdateManager.isVersionGreater("2.0.0", "1.9.9"))
+        org.junit.Assert.assertFalse(com.example.util.AppUpdateManager.isVersionGreater("1.0.5", "1.0.5"))
+        org.junit.Assert.assertFalse(com.example.util.AppUpdateManager.isVersionGreater("1.0.4", "1.0.5"))
+    }
+
+    @Test
+    fun `auto update preference default is true`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val defaultVal = com.example.util.AppUpdateManager.isAutoUpdateEnabled(context)
+        org.junit.Assert.assertTrue(defaultVal)
+    }
 }

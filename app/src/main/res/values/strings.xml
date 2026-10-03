@@ -4,4 +4,6 @@
     <string name="channel_transfers_desc">Уведомления о переводах, списаниях и начислениях</string>
     <string name="channel_service_name">Фоновый сервис банка</string>
     <string name="channel_service_desc">Мониторинг безопасности и мгновенных переводов</string>
+    <string name="channel_updates_name">Обновления банка</string>
+    <string name="channel_updates_desc">Уведомления о новых версиях и автообновлении приложения</string>
 </resources>

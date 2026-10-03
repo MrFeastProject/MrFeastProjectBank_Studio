@@ -16,6 +16,7 @@ object NotificationHelper {
 
     const val CHANNEL_TRANSFERS_ID = "channel_transfers"
     const val CHANNEL_SERVICE_ID = "channel_service"
+    const val CHANNEL_UPDATES_ID = "channel_updates"
 
     private const val FOREGROUND_NOTIFICATION_ID = 9001
 
@@ -48,8 +49,22 @@ object NotificationHelper {
                 setShowBadge(false)
             }
 
+            // 3. High-priority channel for App Updates & Auto-update
+            val updatesChannel = NotificationChannel(
+                CHANNEL_UPDATES_ID,
+                context.getString(R.string.channel_updates_name),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = context.getString(R.string.channel_updates_desc)
+                enableVibration(true)
+                enableLights(true)
+                setShowBadge(true)
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            }
+
             notificationManager.createNotificationChannel(transferChannel)
             notificationManager.createNotificationChannel(serviceChannel)
+            notificationManager.createNotificationChannel(updatesChannel)
         }
     }
 

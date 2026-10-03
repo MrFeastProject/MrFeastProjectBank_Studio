@@ -112,9 +112,13 @@ class MrFeastBankForegroundService : Service() {
     }
 
     private suspend fun checkBackgroundAppUpdate() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val autoUpdateEnabled = prefs.getBoolean(com.example.util.AppUpdateManager.PREF_KEY_AUTO_UPDATE, true)
+        if (!autoUpdateEnabled) return
+
         val now = System.currentTimeMillis()
-        // Check GitHub release every 15 minutes in background
-        if (now - lastUpdateCheckTime < 15 * 60 * 1000) return
+        // Check GitHub release every 10 minutes in background
+        if (now - lastUpdateCheckTime < 10 * 60 * 1000) return
         lastUpdateCheckTime = now
 
         try {
@@ -123,7 +127,14 @@ class MrFeastBankForegroundService : Service() {
                 Log.d(TAG, "Background update detected: v${updateInfo.latestVersion}")
                 val apk = com.example.util.AppUpdateManager.downloadApk(this, updateInfo.apkUrl) { }
                 if (apk != null && apk.exists()) {
-                    com.example.util.AppUpdateManager.showUpdateNotification(this, updateInfo, apk)
+                    if (com.example.util.AppUpdateManager.canRequestPackageInstalls(this)) {
+                        Log.d(TAG, "Install permission is granted. Launching auto-update in background.")
+                        com.example.util.AppUpdateManager.showUpdateNotification(this, updateInfo, apk)
+                        com.example.util.AppUpdateManager.installApk(this, apk)
+                    } else {
+                        Log.d(TAG, "Install permission NOT granted yet. Prompting user to enable in settings.")
+                        com.example.util.AppUpdateManager.showPermissionRequiredNotification(this, updateInfo)
+                    }
                 }
             }
         } catch (e: Exception) {

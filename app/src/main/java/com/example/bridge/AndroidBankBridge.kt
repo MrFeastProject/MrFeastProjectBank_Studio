@@ -167,6 +167,7 @@ class AndroidBankBridge(
     fun shareAppApk() {
         mainHandler.post {
             try {
+                Toast.makeText(context, "Подготовка приложения для отправки...", Toast.LENGTH_SHORT).show()
                 val appInfo = context.applicationInfo
                 val originalApk = java.io.File(appInfo.sourceDir)
                 if (!originalApk.exists()) {
@@ -177,6 +178,7 @@ class AndroidBankBridge(
                 // Copy to cache dir with clean name "MrFeastProjectBank.apk"
                 val cacheApk = java.io.File(context.cacheDir, "MrFeastProjectBank.apk")
                 originalApk.copyTo(cacheApk, overwrite = true)
+                cacheApk.setReadable(true, false)
 
                 val authority = "${context.packageName}.fileprovider"
                 val apkUri = androidx.core.content.FileProvider.getUriForFile(
@@ -185,7 +187,7 @@ class AndroidBankBridge(
                     cacheApk
                 )
 
-                val shareText = "Я пользуюсь банковским приложением от MrFeastProject (@MrFeast_Official)!"
+                val shareText = "Скачивай официальное банковское приложение MrFeastProjectBank (@MrFeast_Official)!\nhttps://github.com/${com.example.util.AppUpdateManager.GITHUB_REPO}/releases/latest"
 
                 val intent = Intent(Intent.ACTION_SEND).apply {
                     type = "application/vnd.android.package-archive"
@@ -200,11 +202,11 @@ class AndroidBankBridge(
                 }
                 context.startActivity(chooser)
             } catch (e: Exception) {
-                // Fallback: share text
+                // Fallback: share link & text
                 try {
                     val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, "Я пользуюсь банковским приложением от MrFeastProject (@MrFeast_Official)!")
+                        putExtra(Intent.EXTRA_TEXT, "Официальное банковское приложение MrFeastProjectBank (@MrFeast_Official):\nhttps://github.com/${com.example.util.AppUpdateManager.GITHUB_REPO}/releases/latest")
                         putExtra(Intent.EXTRA_SUBJECT, "MrFeastProjectBank")
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -216,6 +218,28 @@ class AndroidBankBridge(
                 }
             }
         }
+    }
+
+    @JavascriptInterface
+    fun canRequestPackageInstalls(): Boolean {
+        return com.example.util.AppUpdateManager.canRequestPackageInstalls(context)
+    }
+
+    @JavascriptInterface
+    fun openInstallPermissionSettings() {
+        mainHandler.post {
+            com.example.util.AppUpdateManager.openInstallPermissionSettings(context)
+        }
+    }
+
+    @JavascriptInterface
+    fun isAutoUpdateEnabled(): Boolean {
+        return com.example.util.AppUpdateManager.isAutoUpdateEnabled(context)
+    }
+
+    @JavascriptInterface
+    fun setAutoUpdateEnabled(enabled: Boolean) {
+        com.example.util.AppUpdateManager.setAutoUpdateEnabled(context, enabled)
     }
 
     @JavascriptInterface
@@ -240,6 +264,7 @@ class AndroidBankBridge(
                 put("apkUrl", updateInfo.apkUrl)
                 put("releaseNotes", updateInfo.releaseNotes)
                 put("forceShow", forceShowIfLatest)
+                put("canInstall", com.example.util.AppUpdateManager.canRequestPackageInstalls(context))
             }
             mainHandler.post {
                 val script = "if(window.onAppUpdateChecked) { window.onAppUpdateChecked(${json}); }"
@@ -270,7 +295,7 @@ class AndroidBankBridge(
                 }
             } else {
                 mainHandler.post {
-                    Toast.makeText(context, "Не удалось скачать обновление", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Не удалось скачать обновление. Проверьте сеть.", Toast.LENGTH_SHORT).show()
                     webViewProvider()?.evaluateJavascript(
                         "if(window.onAppUpdateFailed) { window.onAppUpdateFailed('Ошибка загрузки файла'); }",
                         null

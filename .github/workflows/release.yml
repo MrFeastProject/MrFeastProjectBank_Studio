@@ -57,15 +57,21 @@ jobs:
           sed -i 's/versionCode = [0-9]*/versionCode = ${{ steps.versioning.outputs.NEXT_CODE }}/' app/build.gradle.kts
           sed -i 's/versionName = "[^"]*"/versionName = "${{ steps.versioning.outputs.NEXT_VERSION }}"/' app/build.gradle.kts
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+      - name: Restore persistent debug keystore
+        run: |
+          if [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+            echo "Restored debug.keystore from base64"
+          fi
+
+      - name: Build Signed APK
+        run: ./gradlew assembleDebug
 
       - name: Rename and Prepare APK Asset
         run: |
           mkdir -p release-artifacts
-          cp app/build/outputs/apk/release/app-release-unsigned.apk release-artifacts/MrFeastProjectBank-${{ steps.versioning.outputs.NEXT_VERSION }}.apk || \
-          cp app/build/outputs/apk/release/app-release.apk release-artifacts/MrFeastProjectBank-${{ steps.versioning.outputs.NEXT_VERSION }}.apk || \
-          cp app/build/outputs/apk/debug/app-debug.apk release-artifacts/MrFeastProjectBank-${{ steps.versioning.outputs.NEXT_VERSION }}.apk
+          cp app/build/outputs/apk/debug/app-debug.apk release-artifacts/MrFeastProjectBank-${{ steps.versioning.outputs.NEXT_VERSION }}.apk || \
+          cp app/build/outputs/apk/debug/*.apk release-artifacts/MrFeastProjectBank-${{ steps.versioning.outputs.NEXT_VERSION }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

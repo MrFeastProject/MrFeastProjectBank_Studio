@@ -46,8 +46,25 @@ class MainActivity : ComponentActivity() {
 
     private var activeWebView: WebView? = null
 
+    companion object {
+        var currentInstance: MainActivity? = null
+
+        fun closeAppForUpdate() {
+            currentInstance?.let { activity ->
+                activity.runOnUiThread {
+                    try {
+                        activity.finishAffinity()
+                    } catch (e: Exception) {
+                        try { activity.finish() } catch (_: Exception) {}
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        currentInstance = this
 
         // Force hardware acceleration at window level for ultra-smooth 2D rendering
         window.setFlags(
@@ -76,11 +93,24 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        currentInstance = this
         // Trigger real-time data sync immediately when returning to foreground
         activeWebView?.evaluateJavascript(
             "if(window.refreshBankRealtime) { window.refreshBankRealtime(); }",
             null
         )
+        // Also refresh app update permissions state in JS if profile is open
+        activeWebView?.evaluateJavascript(
+            "if(window.onInstallPermissionChanged) { window.onInstallPermissionChanged(); }",
+            null
+        )
+    }
+
+    override fun onDestroy() {
+        if (currentInstance == this) {
+            currentInstance = null
+        }
+        super.onDestroy()
     }
 }
 
