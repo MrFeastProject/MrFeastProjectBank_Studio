@@ -3152,7 +3152,7 @@ body.modal-open{
           </svg>
           <span>Автообновление банка</span>
         </div>
-        <span class="badge-chip" id="profileAppVerBadge">v1.0.5</span>
+        <span class="badge-chip" id="profileAppVerBadge">v1.0.8</span>
       </div>
 
       <div class="profile-section-hint">
@@ -3226,9 +3226,9 @@ body.modal-open{
 
     <div class="app-update-body">
       <div class="update-version-hero">
-        <span class="ver-badge current-ver" id="modalCurVer">v1.0.5</span>
+        <span class="ver-badge current-ver" id="modalCurVer">v1.0.8</span>
         <span class="ver-arrow">➜</span>
-        <span class="ver-badge latest-ver" id="modalNewVer">v1.0.6</span>
+        <span class="ver-badge latest-ver" id="modalNewVer">v1.0.8</span>
       </div>
 
       <div class="update-notes-box">
@@ -3244,6 +3244,10 @@ body.modal-open{
         <button class="gold-btn-sm" id="modalGrantPermBtn" style="margin-top:8px;width:100%;">
           Открыть настройки устройства
         </button>
+      </div>
+
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:8px;line-height:1.4;text-align:center;">
+        💡 При ошибке «Приложение не установлено» удалите предыдущую сборку (из-за несовпадающего сертификата в старых версиях).
       </div>
 
       <!-- Download progress -->
@@ -3555,7 +3559,7 @@ const NativeBridge = {
     if (this.isAvailable() && window.AndroidBankBridge.getAppVersion) {
       return window.AndroidBankBridge.getAppVersion();
     }
-    return "1.0.5";
+    return "1.0.8";
   },
   checkForAppUpdate(forceShowIfLatest = false) {
     if (this.isAvailable() && window.AndroidBankBridge.checkForAppUpdate) {
@@ -4325,8 +4329,7 @@ if($("confirmUpdateBtn")){
     const canInstall = NativeBridge.canRequestPackageInstalls();
     if(!canInstall){
       NativeBridge.openInstallPermissionSettings();
-      showToast("Сначала выдайте разрешение «Установка неизвестных приложений» в настройках", true);
-      return;
+      showToast("Разрешите установку обновлений в настройках Android");
     }
 
     $("confirmUpdateBtn").disabled = true;
@@ -4353,7 +4356,7 @@ window.onAppUpdateReady = function(){
   if($("modalProgressLabel")) $("modalProgressLabel").textContent = "Загрузка завершена!";
   if($("modalAutoCloseHint")) $("modalAutoCloseHint").classList.remove("hidden");
   if($("modalUpdateActions")) $("modalUpdateActions").classList.add("hidden");
-  showToast("Запуск обновления! Приложение сейчас закроется...");
+  showToast("Обновление загружено! Запуск установщика Android...");
 };
 
 window.onAppUpdateFailed = function(err){

@@ -31,14 +31,14 @@ jobs:
         id: versioning
         run: |
           # Fetch latest release tag from GitHub repository
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.5")
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.7")
           CLEAN_VERSION=${LATEST_TAG#v}
 
           # Split into major.minor.patch
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CLEAN_VERSION"
           MAJOR=${MAJOR:-1}
           MINOR=${MINOR:-0}
-          PATCH=${PATCH:-5}
+          PATCH=${PATCH:-7}
 
           # Auto-increment patch version (1.0.5 -> 1.0.6 -> 1.0.7...)
           NEXT_PATCH=$((PATCH + 1))

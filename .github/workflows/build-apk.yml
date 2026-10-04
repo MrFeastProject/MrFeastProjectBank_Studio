@@ -33,8 +33,10 @@ jobs:
         id: version
         shell: bash
         run: |
-          VERSION_CODE=$((10000 + GITHUB_RUN_NUMBER))
-          VERSION_NAME="1.0.${GITHUB_RUN_NUMBER}"
+          # Ensure version is at least 1.0.8
+          PATCH=$((GITHUB_RUN_NUMBER < 8 ? 8 : GITHUB_RUN_NUMBER))
+          VERSION_CODE=$((10000 + PATCH))
+          VERSION_NAME="1.0.${PATCH}"
 
           echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
@@ -50,7 +52,8 @@ jobs:
           elif [ -f debug.keystore ]; then
             echo "debug.keystore already present"
           else
-            keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            echo "Error: debug.keystore.base64 is required to ensure matching APK signing certificates"
+            exit 1
           fi
 
       - name: Build Debug APK

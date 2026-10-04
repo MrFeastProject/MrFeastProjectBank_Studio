@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
             currentInstance?.let { activity ->
                 activity.runOnUiThread {
                     try {
-                        activity.finishAffinity()
+                        activity.moveTaskToBack(true)
                     } catch (e: Exception) {
                         try { activity.finish() } catch (_: Exception) {}
                     }

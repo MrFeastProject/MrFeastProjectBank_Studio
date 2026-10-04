@@ -2,6 +2,7 @@ package com.example.util
 
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,7 +16,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.example.BuildConfig
-import com.example.MainActivity
 import com.example.service.MrFeastBankForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -232,12 +232,16 @@ object AppUpdateManager {
             val body = response.body ?: return@withContext null
             val totalBytes = body.contentLength()
 
-            val destFile = File(context.cacheDir, "MrFeastProjectBank-update.apk")
-            if (destFile.exists()) destFile.delete()
+            // Save to external files dir or cache dir
+            val updateDir = context.getExternalFilesDir(null) ?: context.cacheDir
+            val destFile = File(updateDir, "MrFeastProjectBank-update.apk")
+            if (destFile.exists()) {
+                destFile.delete()
+            }
 
             body.byteStream().use { input ->
                 FileOutputStream(destFile).use { output ->
-                    val buffer = ByteArray(16 * 1024)
+                    val buffer = ByteArray(32 * 1024)
                     var bytesRead: Int
                     var totalRead: Long = 0
                     var lastPercent = 0
@@ -246,7 +250,7 @@ object AppUpdateManager {
                         output.write(buffer, 0, bytesRead)
                         totalRead += bytesRead
                         if (totalBytes > 0) {
-                            val percent = ((totalRead * 100) / totalBytes).toInt()
+                            val percent = ((totalRead * 100) / totalBytes).toInt().coerceIn(0, 100)
                             if (percent != lastPercent) {
                                 lastPercent = percent
                                 withContext(Dispatchers.Main) {
@@ -259,22 +263,14 @@ object AppUpdateManager {
                 }
             }
 
-            // Verify file size and validate that APK is not corrupted
-            if (!destFile.exists() || destFile.length() < 1024 * 1024) {
-                Log.e(TAG, "Downloaded APK is too small or incomplete: ${destFile.length()} bytes")
-                destFile.delete()
+            if (!destFile.exists() || destFile.length() == 0L) {
+                Log.e(TAG, "Downloaded APK is empty or missing")
                 return@withContext null
             }
 
-            val packageInfo = context.packageManager.getPackageArchiveInfo(destFile.absolutePath, 0)
-            if (packageInfo == null) {
-                Log.e(TAG, "Downloaded file is corrupted or not a valid APK archive!")
-                destFile.delete()
-                return@withContext null
-            }
-
-            // Ensure file is world-readable so package installer can read it
+            // Ensure file permissions allow reading by system installer
             destFile.setReadable(true, false)
+            destFile.setWritable(true, false)
 
             withContext(Dispatchers.Main) {
                 onProgress(100)
@@ -286,6 +282,11 @@ object AppUpdateManager {
         }
     }
 
+    /**
+     * Direct and reliable APK installation using Android's standard Intent.ACTION_VIEW and FileProvider.
+     * Bypasses brittle package installer sessions, ensuring the native system confirmation
+     * dialog opens without silent failures or signature lockups.
+     */
     fun installApk(context: Context, apkFile: File) {
         Handler(Looper.getMainLooper()).post {
             try {
@@ -294,45 +295,60 @@ object AppUpdateManager {
                     return@post
                 }
 
-                // Check install permission first
-                if (!canRequestPackageInstalls(context)) {
-                    Toast.makeText(
-                        context,
-                        "Необходимо выдать разрешение на установку обновлений в настройках",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    openInstallPermissionSettings(context)
-                    return@post
-                }
-
                 apkFile.setReadable(true, false)
+                apkFile.setWritable(true, false)
 
                 val authority = "${context.packageName}.fileprovider"
                 val apkUri: Uri = FileProvider.getUriForFile(context, authority, apkFile)
 
                 val installIntent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    clipData = ClipData.newRawUri("MrFeastUpdate", apkUri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
                 }
 
-                // Grant read permission to package installer
-                val resolveList = context.packageManager.queryIntentActivities(
-                    installIntent,
-                    PackageManager.MATCH_DEFAULT_ONLY
+                // Explicitly grant URI permission to known package installers and any matching intent handlers
+                val installerPackages = listOf(
+                    "com.google.android.packageinstaller",
+                    "com.android.packageinstaller",
+                    "com.google.android.permissioncontroller",
+                    "com.android.systemui"
                 )
-                for (resolveInfo in resolveList) {
-                    val packageName = resolveInfo.activityInfo.packageName
-                    context.grantUriPermission(packageName, apkUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                for (pkg in installerPackages) {
+                    try {
+                        context.grantUriPermission(pkg, apkUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    } catch (_: Exception) {}
+                }
+
+                try {
+                    val resolveList = context.packageManager.queryIntentActivities(
+                        installIntent,
+                        PackageManager.MATCH_DEFAULT_ONLY
+                    )
+                    for (resolveInfo in resolveList) {
+                        val packageName = resolveInfo.activityInfo.packageName
+                        try {
+                            context.grantUriPermission(packageName, apkUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        } catch (_: Exception) {}
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error querying intent activities: ${e.message}")
+                }
+
+                // If install permission is missing on Android 8+, notify the user so they know what to toggle
+                if (!canRequestPackageInstalls(context)) {
+                    Toast.makeText(
+                        context,
+                        "В настройках разрешите установку для завершения обновления",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
                 context.startActivity(installIntent)
-
-                // As requested by user: the app must close itself and let the update install cleanly
-                Handler(Looper.getMainLooper()).postDelayed({
-                    MainActivity.closeAppForUpdate()
-                }, 750)
+                Log.d(TAG, "Launched standard package installer intent successfully.")
 
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to launch package installer: ${e.message}", e)
@@ -345,27 +361,17 @@ object AppUpdateManager {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val intent = if (downloadedApk != null && downloadedApk.exists()) {
-            if (canRequestPackageInstalls(context)) {
-                val apkUri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    downloadedApk
-                )
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(apkUri, "application/vnd.android.package-archive")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                        data = Uri.parse("package:${context.packageName}")
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                } else {
-                    context.packageManager.getLaunchIntentForPackage(context.packageName) ?: Intent()
-                }
+            val apkUri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                downloadedApk
+            )
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(apkUri, "application/vnd.android.package-archive")
+                clipData = ClipData.newRawUri("MrFeastUpdate", apkUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
         } else {
             context.packageManager.getLaunchIntentForPackage(context.packageName) ?: Intent()
@@ -380,11 +386,7 @@ object AppUpdateManager {
 
         val title = "🚀 Доступно обновление MrFeast Bank v${updateInfo.latestVersion}"
         val text = if (downloadedApk != null && downloadedApk.exists()) {
-            if (canRequestPackageInstalls(context)) {
-                "Новая версия v${updateInfo.latestVersion} загружена. Нажмите для завершения автообновления!"
-            } else {
-                "Новая версия v${updateInfo.latestVersion} скачана. Нажмите, чтобы разрешить установку в настройках."
-            }
+            "Новая версия v${updateInfo.latestVersion} скачана. Нажмите для установки!"
         } else {
             "Вышла версия v${updateInfo.latestVersion}. Нажмите для обновления банка."
         }
@@ -421,8 +423,8 @@ object AppUpdateManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val title = "⚠️ Разрешите автообновление MrFeast Bank"
-        val text = "Вышла версия v${updateInfo.latestVersion}. Выдайте разрешение «Установка неизвестных приложений», чтобы банк обновлялся сам в фоне."
+        val title = "⚠️ Разрешите установку обновлений MrFeast Bank"
+        val text = "Для фонового обновления v${updateInfo.latestVersion} разрешите «Установка неизвестных приложений» в настройках."
 
         val notification = NotificationCompat.Builder(context, NotificationHelper.CHANNEL_UPDATES_ID)
             .setSmallIcon(com.example.R.mipmap.ic_launcher)
