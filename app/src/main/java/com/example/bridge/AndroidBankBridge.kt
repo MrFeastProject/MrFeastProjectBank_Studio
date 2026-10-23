@@ -325,4 +325,89 @@ class AndroidBankBridge(
             }
         }
     }
+
+    // =========================================================
+    // MRFEASTPROJECT FRAMEWORK (com.mrfeastproject.framework.connect)
+    // =========================================================
+
+    @JavascriptInterface
+    fun isFrameworkInstalled(): Boolean {
+        return com.example.util.FrameworkManager.isInstalled(context)
+    }
+
+    @JavascriptInterface
+    fun isFrameworkRunning(): Boolean {
+        return com.example.util.FrameworkManager.isRunning(context)
+    }
+
+    @JavascriptInterface
+    fun launchFramework(): Boolean {
+        val success = com.example.util.FrameworkManager.launch(context)
+        if (success) {
+            mainHandler.post {
+                Toast.makeText(context, "Запуск MrFeastProject Framework...", Toast.LENGTH_SHORT).show()
+            }
+        }
+        return success
+    }
+
+    @JavascriptInterface
+    fun getFrameworkStatusJson(): String {
+        val json = JSONObject().apply {
+            put("installed", com.example.util.FrameworkManager.isInstalled(context))
+            put("running", com.example.util.FrameworkManager.isRunning(context))
+            put("packageName", com.example.util.FrameworkManager.PACKAGE_NAME)
+            put("downloadUrl", com.example.util.FrameworkManager.DEFAULT_APK_URL)
+            put("blobUrl", com.example.util.FrameworkManager.BLOB_APK_URL)
+            put("repoUrl", com.example.util.FrameworkManager.REPO_URL)
+            put("canInstall", com.example.util.AppUpdateManager.canRequestPackageInstalls(context))
+        }
+        return json.toString()
+    }
+
+    @JavascriptInterface
+    fun downloadAndInstallFramework(customUrl: String?) {
+        val url = if (customUrl.isNullOrBlank()) {
+            com.example.util.FrameworkManager.DEFAULT_APK_URL
+        } else {
+            customUrl.trim()
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            mainHandler.post {
+                Toast.makeText(context, "Загрузка MrFeastProject Framework...", Toast.LENGTH_SHORT).show()
+            }
+            val apkFile = com.example.util.FrameworkManager.downloadFrameworkApk(context, url) { percent ->
+                mainHandler.post {
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onFrameworkDownloadProgress) { window.onFrameworkDownloadProgress($percent); }",
+                        null
+                    )
+                }
+            }
+
+            if (apkFile != null && apkFile.exists()) {
+                mainHandler.post {
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onFrameworkDownloadReady) { window.onFrameworkDownloadReady(); }",
+                        null
+                    )
+                    com.example.util.AppUpdateManager.installApk(context, apkFile)
+                }
+            } else {
+                mainHandler.post {
+                    Toast.makeText(
+                        context,
+                        "Не удалось скачать MrFeastProject Framework. Проверьте интернет-соединение.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    webViewProvider()?.evaluateJavascript(
+                        "if(window.onFrameworkDownloadError) { window.onFrameworkDownloadError('Ошибка загрузки установочного APK'); }",
+                        null
+                    )
+                }
+            }
+        }
+    }
 }
+

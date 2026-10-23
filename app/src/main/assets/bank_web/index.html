@@ -2490,6 +2490,670 @@ body.modal-open{
   .deposit-bonus-value{font-size:36px;}
 }
 
+/* ================= NEON DIAMOND CARD & CAROUSEL ================= */
+.card-carousel-wrapper{
+  position:relative;
+  width:var(--card-w);
+  height:var(--card-h);
+  margin:0 auto;
+}
+.card-slide-item{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  transition:transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease;
+  will-change:transform, opacity;
+}
+.card-slide-item.slide-gold{
+  transform:translateX(0);
+  opacity:1;
+  pointer-events:auto;
+  z-index:2;
+}
+.card-slide-item.slide-gold.slide-out{
+  transform:translateX(-108%);
+  opacity:0;
+  pointer-events:none;
+  z-index:1;
+}
+.card-slide-item.slide-diamond{
+  transform:translateX(108%);
+  opacity:0;
+  pointer-events:none;
+  z-index:1;
+}
+.card-slide-item.slide-diamond.slide-in{
+  transform:translateX(0);
+  opacity:1;
+  pointer-events:auto;
+  z-index:2;
+}
+
+/* Card switcher controls for MFP-180621 */
+.card-switcher{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-top:14px;
+}
+.card-switch-tab{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 16px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.25s;
+  user-select:none;
+}
+.card-switch-tab.active{
+  background:rgba(212,175,55,0.16);
+  border-color:rgba(212,175,55,0.6);
+  color:var(--gold-light);
+  box-shadow:0 0 12px rgba(212,175,55,0.25);
+}
+.card-switch-tab#tabCardDiamond.active{
+  background:rgba(0,240,255,0.16);
+  border-color:rgba(0,240,255,0.7);
+  color:#38bdf8;
+  box-shadow:0 0 14px rgba(0,240,255,0.35);
+}
+
+/* Neon Diamond Card Visual Styling */
+.card-diamond .face{
+  background:
+    radial-gradient(circle at 85% 15%, rgba(0, 240, 255, 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 15% 85%, rgba(2, 132, 199, 0.25) 0%, transparent 55%),
+    linear-gradient(135deg, #020617 0%, #06152d 50%, #020712 100%);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 160, 255, 0.45),
+    0 0 0 1.5px rgba(0, 240, 255, 0.65),
+    inset 0 0 30px rgba(0, 200, 255, 0.15);
+}
+.card-diamond .face::before{
+  background:linear-gradient(160deg, rgba(0, 240, 255, 0.12), transparent 45%);
+}
+.diamond-bg-glow{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at 50% 50%, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+  pointer-events:none;
+}
+.bank-name-diamond{
+  background:linear-gradient(180deg, #e0f2fe, #38bdf8, #00f0ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 0 15px rgba(0, 240, 255, 0.6);
+}
+.diamond-pill-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  padding:4px 10px;
+  border-radius:20px;
+  background:rgba(0, 240, 255, 0.12);
+  border:1px solid rgba(0, 240, 255, 0.6);
+  color:#38bdf8;
+  text-shadow:0 0 8px rgba(0, 240, 255, 0.6);
+  box-shadow:0 0 12px rgba(0, 240, 255, 0.2);
+}
+.chip-diamond{
+  width:clamp(40px,11vw,52px);
+  height:clamp(30px,8vw,40px);
+  border-radius:7px;
+  background:linear-gradient(135deg, #e0f2fe, #38bdf8 50%, #0284c7);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3), 0 0 10px rgba(0, 240, 255, 0.6);
+  position:relative;
+  margin-top:6px;
+}
+.chip-diamond::after{
+  content:"";
+  position:absolute;
+  inset:18% 22%;
+  border:1px solid rgba(0,0,0,.35);
+  border-radius:3px;
+  background:
+    linear-gradient(to right,transparent 48%,rgba(0,0,0,.3) 48% 52%,transparent 52%),
+    linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.25) 30% 32%,transparent 32% 64%,rgba(0,0,0,.25) 64% 66%,transparent 66%);
+}
+.number-diamond{
+  font-size:clamp(17px,5vw,23px);
+  letter-spacing:3px;
+  font-weight:600;
+  color:#f0f9ff;
+  text-shadow:0 0 12px rgba(56, 189, 248, 0.9), 0 1px 3px rgba(0,0,0,0.8);
+  font-variant-numeric:tabular-nums;
+}
+.k-diamond{
+  color:#7dd3fc !important;
+}
+.v-diamond{
+  color:#e0f2fe !important;
+  text-shadow:0 0 8px rgba(56, 189, 248, 0.4);
+}
+.network-diamond{
+  background:linear-gradient(180deg, #e0f2fe, #38bdf8);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 0 10px rgba(0, 240, 255, 0.5);
+  font-size:clamp(13px,3.5vw,17px);
+}
+.bank-name-tr-diamond{
+  align-self:flex-end;
+  font-size:clamp(12px,3.4vw,14px);
+  font-weight:700;
+  background:linear-gradient(180deg, #e0f2fe, #38bdf8);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:14px;
+}
+.strip-diamond{
+  height:44px;
+  background:linear-gradient(90deg, #020617, #062244, #020617);
+  border-top:1px solid rgba(0, 240, 255, 0.4);
+  border-bottom:1px solid rgba(0, 240, 255, 0.4);
+  margin:0 -26px 14px -26px;
+}
+.sign-label-diamond{
+  color:#7dd3fc !important;
+}
+.sign-box-diamond{
+  background:rgba(224, 242, 254, 0.95) !important;
+  color:#020617 !important;
+  font-weight:800 !important;
+}
+.not-valid-diamond{
+  font-size:8px;
+  line-height:1.3;
+  color:#38bdf8;
+  max-width:130px;
+}
+.slogan-diamond{
+  font-size:9px;
+  line-height:1.4;
+  color:#7dd3fc;
+}
+
+/* ================= EARN MODE MODAL ================= */
+.earn-modal-card{
+  width:min(500px, calc(100vw - 28px));
+  text-align:center;
+}
+.earn-rules-banner{
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(212, 175, 55, 0.08);
+  border:1px solid rgba(212, 175, 55, 0.25);
+  font-size:13px;
+  line-height:1.55;
+  color:var(--text);
+  margin-bottom:16px;
+  text-align:left;
+}
+.earn-stats-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+.earn-stat-card{
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255, 255, 255, 0.035);
+  border:1px solid rgba(255, 255, 255, 0.08);
+}
+.earn-stat-full{
+  grid-column:span 2;
+  padding:10px 14px;
+}
+.earn-stat-label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.earn-stat-val{
+  font-size:26px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+.earn-stat-val.gold-val{
+  color:var(--gold-light);
+  text-shadow:0 0 12px rgba(212, 175, 55, 0.35);
+}
+.earn-stat-val.timer-val{
+  color:#38bdf8;
+  text-shadow:0 0 12px rgba(56, 189, 248, 0.35);
+}
+.earn-stat-sub{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+}
+.earn-center-box{
+  position:relative;
+  margin:18px auto 14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:150px;
+}
+.earn-particles-container{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:visible;
+}
+.earn-mini-circle-btn{
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  border:3.5px solid rgba(255, 235, 140, 0.95);
+  background:radial-gradient(circle at 35% 35%, #fff2a3 0%, #d4af37 55%, #8c6d1f 100%);
+  box-shadow:0 0 35px rgba(212, 175, 55, 0.6), 0 12px 28px rgba(0,0,0,0.65);
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
+  transition:transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.earn-mini-circle-btn:active{
+  transform:scale(0.91);
+  filter:brightness(1.22);
+  box-shadow:0 0 45px rgba(212, 175, 55, 0.85), 0 6px 14px rgba(0,0,0,0.7);
+}
+.earn-mini-circle-btn.disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+  filter:grayscale(0.8);
+  transform:none;
+  box-shadow:none;
+}
+.earn-mini-icon{
+  font-size:24px;
+  line-height:1;
+}
+.earn-mini-val{
+  font-size:13px;
+  font-weight:900;
+  color:#1a1200;
+  text-shadow:0 1px 0 rgba(255,255,255,0.4);
+}
+.earn-tap-hint{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:14px;
+}
+.earn-float-num{
+  position:absolute;
+  font-size:22px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 0 10px #d4af37, 0 0 20px #f5d77a;
+  pointer-events:none;
+  animation:earnFloatUp 0.8s ease-out forwards;
+  transform:translate(-50%, -50%);
+}
+@keyframes earnFloatUp{
+  0%{opacity:1;transform:translate(-50%,0) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-75px) scale(1.35);}
+}
+.earn-cooldown-box{
+  padding:18px;
+  border-radius:18px;
+  background:rgba(56, 189, 248, 0.08);
+  border:1px solid rgba(56, 189, 248, 0.3);
+  margin:12px 0;
+  text-align:center;
+}
+.earn-cooldown-icon{
+  font-size:32px;
+  margin-bottom:6px;
+}
+.earn-cooldown-title{
+  font-size:15px;
+  font-weight:800;
+  color:#38bdf8;
+  margin-bottom:4px;
+}
+.earn-cooldown-timer{
+  font-size:34px;
+  font-weight:900;
+  color:#e0f2fe;
+  font-variant-numeric:tabular-nums;
+  margin:8px 0;
+  text-shadow:0 0 15px rgba(56, 189, 248, 0.5);
+}
+.earn-cooldown-desc{
+  font-size:12px;
+  color:var(--muted);
+}
+.earn-claim-box{
+  padding:18px;
+  border-radius:18px;
+  background:rgba(212, 175, 55, 0.1);
+  border:1px solid rgba(212, 175, 55, 0.4);
+  margin:12px 0;
+  text-align:center;
+}
+.earn-claim-title{
+  font-size:17px;
+  font-weight:800;
+  color:var(--gold-light);
+  margin-bottom:6px;
+}
+.earn-claim-amount{
+  font-size:38px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 0 15px rgba(212, 175, 55, 0.6);
+  margin-bottom:14px;
+}
+
+/* ================= TRANSFER MODAL RECIPIENT LAYOUT ================= */
+.transfer-recipient-top{
+  display:flex;
+  justify-content:center;
+  margin:10px 0 12px;
+}
+.transfer-avatar-circle{
+  width:76px;
+  height:76px;
+  border-radius:50%;
+  border:2.5px solid var(--gold);
+  box-shadow:0 0 20px rgba(212, 175, 55, 0.35);
+  display:grid;
+  place-items:center;
+  font-size:30px;
+  font-weight:800;
+  background:#161616;
+  overflow:hidden;
+}
+.transfer-avatar-circle img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.transfer-cards-prompt{
+  text-align:center;
+  font-size:13px;
+  font-weight:800;
+  color:var(--gold-light);
+  margin:8px 0 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.transfer-multi-cards-selector{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+.transfer-card-option{
+  position:relative;
+  border-radius:14px;
+  padding:4px;
+  border:2px solid rgba(255, 255, 255, 0.1);
+  background:rgba(255, 255, 255, 0.03);
+  cursor:pointer;
+  transition:all 0.25s;
+}
+.transfer-card-option.active{
+  border-color:var(--gold);
+  box-shadow:0 0 16px rgba(212, 175, 55, 0.35);
+  background:rgba(212, 175, 55, 0.06);
+}
+.transfer-card-option[data-card-type="diamond"].active{
+  border-color:#00f0ff;
+  box-shadow:0 0 16px rgba(0, 240, 255, 0.4);
+  background:rgba(0, 240, 255, 0.06);
+}
+.transfer-card-check{
+  position:absolute;
+  top:6px;
+  right:8px;
+  font-size:9px;
+  font-weight:800;
+  padding:2px 6px;
+  border-radius:10px;
+  background:var(--gold);
+  color:#000;
+  display:none;
+  z-index:2;
+}
+.transfer-card-option.active .transfer-card-check{
+  display:block;
+}
+.transfer-card-option[data-card-type="diamond"].active .transfer-card-check{
+  background:#00f0ff;
+  color:#000;
+}
+.transfer-mini-card{
+  border-radius:10px;
+  padding:10px 12px;
+  position:relative;
+  overflow:hidden;
+  height:105px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.gold-mini-card{
+  background:linear-gradient(135deg, #1f1a10 0%, #121008 60%, #050505 100%);
+  border:1px solid rgba(212, 175, 55, 0.35);
+}
+.diamond-mini-card{
+  background:linear-gradient(135deg, #020617 0%, #07193a 60%, #020813 100%);
+  border:1px solid rgba(0, 240, 255, 0.5);
+  box-shadow:inset 0 0 15px rgba(0, 240, 255, 0.15);
+}
+.mini-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.mini-bank-name{
+  font-size:10px;
+  font-weight:700;
+  color:var(--gold-light);
+}
+.mini-bank-name.diamond-text{
+  color:#38bdf8;
+}
+.mini-network{
+  font-size:9px;
+  font-weight:800;
+  color:var(--gold-light);
+}
+.mini-network.diamond-text{
+  color:#38bdf8;
+}
+.mini-chip{
+  width:22px;
+  height:16px;
+  border-radius:3px;
+  margin:3px 0;
+}
+.mini-chip.gold-chip{
+  background:linear-gradient(135deg, var(--gold-light), var(--gold-deep));
+}
+.mini-chip.diamond-chip{
+  background:linear-gradient(135deg, #e0f2fe, #0284c7);
+}
+.mini-card-num{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--text);
+  font-variant-numeric:tabular-nums;
+}
+.mini-card-num.diamond-num{
+  color:#f0f9ff;
+  text-shadow:0 0 6px rgba(0, 240, 255, 0.6);
+}
+.mini-card-bot{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+}
+.mini-holder{
+  font-size:10px;
+  font-weight:600;
+  color:var(--muted);
+  max-width:65%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.mini-badge-name{
+  font-size:9px;
+  font-weight:700;
+  color:var(--gold-light);
+}
+.diamond-badge-pill{
+  color:#38bdf8;
+}
+.transfer-single-card-wrap{
+  margin:6px auto 14px;
+  width:min(100%, 320px);
+}
+.transfer-user-info-card{
+  display:grid;
+  gap:8px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255, 255, 255, 0.035);
+  border:1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom:16px;
+}
+.transfer-info-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+}
+.info-label{
+  color:var(--muted);
+}
+.info-val{
+  font-weight:700;
+  color:var(--text);
+  text-align:right;
+  overflow-wrap:anywhere;
+}
+.card-name-val{
+  color:var(--gold-light);
+}
+/* ================= FRAMEWORK REQUIRED MODAL ================= */
+.framework-modal-card{
+  width:min(100%, 460px);
+  border:1px solid rgba(212, 175, 55, 0.45);
+  box-shadow:0 40px 100px rgba(0,0,0,0.92), 0 0 50px rgba(212,175,55,0.15);
+}
+.framework-icon-shield{
+  width:50px;
+  height:50px;
+  border-radius:15px;
+  background:radial-gradient(circle at 30% 25%, rgba(245, 215, 122, 0.28), rgba(212, 175, 55, 0.08));
+  border:1.5px solid rgba(212, 175, 55, 0.4);
+  display:grid;
+  place-items:center;
+  flex:none;
+}
+.framework-status-banner{
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255, 255, 255, 0.035);
+  border:1px solid rgba(255, 255, 255, 0.08);
+}
+.framework-status-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.framework-status-label{
+  font-size:12px;
+  color:var(--muted);
+}
+.framework-status-badge{
+  font-size:11px;
+  font-weight:700;
+  padding:4px 9px;
+  border-radius:8px;
+}
+.framework-status-badge.badge-missing{
+  background:rgba(255, 104, 104, 0.15);
+  color:#ff6868;
+  border:1px solid rgba(255, 104, 104, 0.35);
+}
+.framework-status-badge.badge-installing{
+  background:rgba(255, 183, 77, 0.15);
+  color:#ffb74d;
+  border:1px solid rgba(255, 183, 77, 0.35);
+}
+.framework-status-badge.badge-running{
+  background:rgba(95, 207, 128, 0.15);
+  color:#5fcf80;
+  border:1px solid rgba(95, 207, 128, 0.35);
+}
+.framework-pkg-name{
+  font-family:monospace;
+  font-size:11px;
+  color:var(--gold-light);
+  margin-top:7px;
+  word-break:break-all;
+}
+.framework-desc-text{
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.55;
+  color:var(--muted);
+}
+.framework-desc-text b{
+  color:var(--text);
+}
+.framework-desc-text code{
+  background:rgba(255, 255, 255, 0.06);
+  padding:2px 6px;
+  border-radius:6px;
+  color:var(--gold-light);
+  font-size:12px;
+}
+.framework-install-hint{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(212, 175, 55, 0.1);
+  border:1px solid rgba(212, 175, 55, 0.35);
+  font-size:12px;
+  line-height:1.45;
+  color:var(--text);
+}
+
 </style>
 </head>
 
@@ -2535,6 +3199,50 @@ body.modal-open{
 
 <symbol id="contactless" viewBox="0 0 24 24">
   <g fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round">
+    <path d="M5 8a8 8 0 0 1 0 8"/>
+    <path d="M9 5a13 13 0 0 1 0 14"/>
+    <path d="M13 2.5a18 18 0 0 1 0 19"/>
+  </g>
+</symbol>
+
+<linearGradient id="neonDiamondGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#00f0ff"/>
+  <stop offset=".4" stop-color="#38bdf8"/>
+  <stop offset=".8" stop-color="#0284c7"/>
+  <stop offset="1" stop-color="#1d4ed8"/>
+</linearGradient>
+
+<linearGradient id="neonRibbonGrad" x1="0" y1="1" x2="1" y2="0">
+  <stop offset="0" stop-color="#0369a1"/>
+  <stop offset=".5" stop-color="#38bdf8"/>
+  <stop offset="1" stop-color="#00f0ff"/>
+</linearGradient>
+
+<symbol id="logoDiamond" viewBox="0 0 100 100">
+  <polygon points="50,14 86,38 72,86 28,86 14,38" fill="url(#neonDiamondGrad)" opacity=".95"/>
+  <polygon points="50,14 66,38 50,86 34,38" fill="#e0f2fe" opacity=".4"/>
+  <line x1="50" y1="14" x2="50" y2="86" stroke="#38bdf8" stroke-width="2"/>
+  <line x1="14" y1="38" x2="86" y2="38" stroke="#00f0ff" stroke-width="2"/>
+  <line x1="28" y1="86" x2="50" y2="38" stroke="#0284c7" stroke-width="1.5"/>
+  <line x1="72" y1="86" x2="50" y2="38" stroke="#0284c7" stroke-width="1.5"/>
+</symbol>
+
+<symbol id="ribbonDiamond" viewBox="0 0 460 290" preserveAspectRatio="none">
+  <path
+    d="M-20 300 C140 230,300 150,480 40 L480 70 C300 185,150 262,-20 330 Z"
+    fill="url(#neonRibbonGrad)" opacity=".85"/>
+  <g stroke="url(#neonDiamondGrad)" stroke-width="1.2" opacity=".35">
+    <line x1="250" y1="290" x2="470" y2="120"/>
+    <line x1="290" y1="290" x2="480" y2="140"/>
+    <line x1="330" y1="290" x2="490" y2="165"/>
+    <line x1="370" y1="290" x2="500" y2="190"/>
+    <line x1="410" y1="290" x2="510" y2="215"/>
+    <line x1="210" y1="290" x2="460" y2="95"/>
+  </g>
+</symbol>
+
+<symbol id="contactlessDiamond" viewBox="0 0 24 24">
+  <g fill="none" stroke="url(#neonDiamondGrad)" stroke-width="2" stroke-linecap="round">
     <path d="M5 8a8 8 0 0 1 0 8"/>
     <path d="M9 5a13 13 0 0 1 0 14"/>
     <path d="M13 2.5a18 18 0 0 1 0 19"/>
@@ -2753,121 +3461,258 @@ body.modal-open{
 
 </section>
 
-<!-- CARD -->
+<!-- CARDS CAROUSEL -->
 
-<div
-  class="card-scene"
-  id="cardScene"
-  role="button"
-  tabindex="0"
-  aria-label="Перевернуть карту">
+<div class="card-carousel-wrapper" id="cardCarouselWrapper">
 
-  <div class="card" id="card">
+  <!-- CARD 1: Classic Black Gold -->
+  <div
+    class="card-scene card-slide-item slide-gold"
+    id="cardScene"
+    role="button"
+    tabindex="0"
+    aria-label="Перевернуть золотую карту">
 
-    <div class="face front">
+    <div class="card" id="card">
 
-      <svg class="ribbon">
-        <use href="#ribbon"/>
-      </svg>
+      <div class="face front">
 
-      <div class="row-top">
-
-        <svg class="logo">
-          <use href="#logo"/>
+        <svg class="ribbon">
+          <use href="#ribbon"/>
         </svg>
 
-        <div class="bank-name">
+        <div class="row-top">
+
+          <svg class="logo">
+            <use href="#logo"/>
+          </svg>
+
+          <div class="bank-name">
+            MrFeastProjectBank
+          </div>
+
+        </div>
+
+        <div class="chip"></div>
+
+        <div class="number" id="cardNumber">
+          •••• •••• •••• ••••
+        </div>
+
+        <div class="row-bot">
+
+          <div class="meta">
+
+            <div class="k">
+              Держатель карты
+            </div>
+
+            <div class="v" id="holder">
+              —
+            </div>
+
+          </div>
+
+          <div class="meta">
+
+            <div class="k">
+              Идентификатор карты
+            </div>
+
+            <div class="v" id="universalId">
+              —
+            </div>
+
+          </div>
+
+          <div class="network">
+            VISA
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="face back">
+
+        <svg class="ribbon">
+          <use href="#ribbon"/>
+        </svg>
+
+        <div class="bank-name-tr">
           MrFeastProjectBank
         </div>
 
-      </div>
+        <div class="strip"></div>
 
-      <div class="chip"></div>
+        <div class="sign-row">
 
-      <div class="number" id="cardNumber">
-        •••• •••• •••• ••••
-      </div>
+          <div style="flex:1">
 
-      <div class="row-bot">
+            <div class="sign-label">
+              Подпись держателя
+            </div>
 
-        <div class="meta">
+            <div class="sign-box" id="signature">
+              —
+            </div>
 
-          <div class="k">
-            Держатель карты
           </div>
 
-          <div class="v" id="holder">
-            —
+          <div class="not-valid">
+            Действительна<br>только при наличии подписи
           </div>
+
+          <svg class="contactless">
+            <use href="#contactless"/>
+          </svg>
 
         </div>
 
-        <div class="meta">
+        <div class="bottom">
 
-          <div class="k">
-            Идентификатор карты
+          <div class="slogan">
+            Официальный банковский сервис<br>
+            MrFeastProjectBank
           </div>
 
-          <div class="v" id="universalId">
-            —
-          </div>
+          <svg class="logo-b">
+            <use href="#logo"/>
+          </svg>
 
-        </div>
-
-        <div class="network">
-          VISA
         </div>
 
       </div>
 
     </div>
 
-    <div class="face back">
+  </div>
 
-      <svg class="ribbon">
-        <use href="#ribbon"/>
-      </svg>
+  <!-- CARD 2: Neon Diamond Card (Только для MFP-180621) -->
+  <div
+    class="card-scene card-slide-item slide-diamond"
+    id="cardSceneDiamond"
+    role="button"
+    tabindex="0"
+    aria-label="Перевернуть неоновую бриллиантовую карту">
 
-      <div class="bank-name-tr">
-        MrFeastProjectBank
-      </div>
+    <div class="card card-diamond" id="cardDiamond">
 
-      <div class="strip"></div>
+      <div class="face front face-diamond-front">
 
-      <div class="sign-row">
+        <div class="diamond-bg-glow"></div>
 
-        <div style="flex:1">
-
-          <div class="sign-label">
-            Подпись держателя
-          </div>
-
-          <div class="sign-box" id="signature">
-            —
-          </div>
-
-        </div>
-
-        <div class="not-valid">
-          Действительна<br>только при наличии подписи
-        </div>
-
-        <svg class="contactless">
-          <use href="#contactless"/>
+        <svg class="ribbon ribbon-diamond">
+          <use href="#ribbonDiamond"/>
         </svg>
 
-      </div>
+        <div class="row-top">
 
-      <div class="bottom">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <svg class="logo logo-diamond" style="width:34px;height:34px;">
+              <use href="#logoDiamond"/>
+            </svg>
+            <div class="bank-name bank-name-diamond">
+              MrFeastProjectBank
+            </div>
+          </div>
 
-        <div class="slogan">
-          Официальный банковский сервис<br>
-          MrFeastProjectBank
+          <div class="diamond-pill-badge">
+            <span>💎</span> NEON DIAMOND
+          </div>
+
         </div>
 
-        <svg class="logo-b">
-          <use href="#logo"/>
+        <div class="chip chip-diamond"></div>
+
+        <div class="number number-diamond" id="cardNumberDiamond">
+          •••• •••• •••• ••••
+        </div>
+
+        <div class="row-bot">
+
+          <div class="meta">
+
+            <div class="k k-diamond">
+              Держатель карты
+            </div>
+
+            <div class="v v-diamond" id="holderDiamond">
+              —
+            </div>
+
+          </div>
+
+          <div class="meta">
+
+            <div class="k k-diamond">
+              Идентификатор карты
+            </div>
+
+            <div class="v v-diamond" id="universalIdDiamond">
+              MFP-180621
+            </div>
+
+          </div>
+
+          <div class="network network-diamond">
+            DIAMOND INFINITE
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="face back face-diamond-back">
+
+        <div class="diamond-bg-glow"></div>
+
+        <svg class="ribbon ribbon-diamond">
+          <use href="#ribbonDiamond"/>
         </svg>
+
+        <div class="bank-name-tr bank-name-tr-diamond">
+          MrFeastProjectBank 💎 DIAMOND
+        </div>
+
+        <div class="strip strip-diamond"></div>
+
+        <div class="sign-row">
+
+          <div style="flex:1">
+
+            <div class="sign-label sign-label-diamond">
+              Подпись держателя
+            </div>
+
+            <div class="sign-box sign-box-diamond" id="signatureDiamond">
+              —
+            </div>
+
+          </div>
+
+          <div class="not-valid not-valid-diamond">
+            Exclusive Neon Edition<br>MFP-180621
+          </div>
+
+          <svg class="contactless contactless-diamond">
+            <use href="#contactlessDiamond"/>
+          </svg>
+
+        </div>
+
+        <div class="bottom">
+
+          <div class="slogan slogan-diamond">
+            Неоновая бриллиантовая карта VIP<br>
+            MrFeastProjectBank
+          </div>
+
+          <svg class="logo-b logo-b-diamond">
+            <use href="#logoDiamond"/>
+          </svg>
+
+        </div>
 
       </div>
 
@@ -2877,7 +3722,17 @@ body.modal-open{
 
 </div>
 
-<div class="flip-hint">
+<!-- SWITCHER CONTROLS (MFP-180621) -->
+<div class="card-switcher hidden" id="cardSwitcher">
+  <button class="card-switch-tab active" id="tabCardGold" type="button">
+    <span>✦</span> Black Gold
+  </button>
+  <button class="card-switch-tab" id="tabCardDiamond" type="button">
+    <span>💎</span> Neon Diamond
+  </button>
+</div>
+
+<div class="flip-hint" id="cardFlipHint">
 
   <svg
     viewBox="0 0 24 24"
@@ -2892,7 +3747,7 @@ body.modal-open{
 
   </svg>
 
-  Нажмите на карту, чтобы просмотреть дополнительные данные
+  <span id="flipHintText">Нажмите на карту, чтобы перевернуть</span>
 
 </div>
 
@@ -2930,18 +3785,18 @@ body.modal-open{
 
   </button>
 
-  <button class="act" id="payBtn">
+  <button class="act" id="earnBtn">
 
     <span class="ic">
       <svg viewBox="0 0 24 24" fill="none"
-        stroke-width="2" stroke-linecap="round"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round"
         stroke-linejoin="round">
-        <rect x="3" y="5" width="18" height="14" rx="2"/>
-        <path d="M3 10h18"/>
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 6v12M15 9.5a3 3 0 0 0-3-2.5h-1a2.5 2.5 0 0 0 0 5h2a2.5 2.5 0 0 1 0 5h-1a3 3 0 0 1-3-2.5"/>
       </svg>
     </span>
 
-    <span>Оплатить</span>
+    <span>Заработок</span>
 
   </button>
 
@@ -3275,6 +4130,68 @@ body.modal-open{
 
 </div>
 
+<!-- ================= EARN MODE MODAL (РЕЖИМ ЗАРАБОТОК) ================= -->
+<div class="modal hidden" id="earnModal">
+  <div class="modal-card earn-modal-card">
+    <div class="modal-head">
+      <h3>Режим «Заработок»</h3>
+      <button class="close" data-close="earnModal">×</button>
+    </div>
+
+    <div class="earn-rules-banner">
+      ⚡ <b>Правила:</b> Нажимайте на мини-кнопку в центре, чтобы копить по <b>+$0.10</b> за клик! Таймер смены: <b>2 минуты</b>. После окончания таймера заберите всю накопленную сумму. Перезарядка: <b>1 час 30 минут</b>.
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="earn-stats-grid">
+      <div class="earn-stat-card">
+        <div class="earn-stat-label">⏱️ Время смены</div>
+        <div class="earn-stat-val timer-val" id="earnTimerText">02:00</div>
+      </div>
+      <div class="earn-stat-card">
+        <div class="earn-stat-label">💰 Накоплено</div>
+        <div class="earn-stat-val gold-val" id="earnAccumulatedText">$0.00</div>
+      </div>
+      <div class="earn-stat-card earn-stat-full">
+        <div class="earn-stat-label">👆 Статистика кликов</div>
+        <div class="earn-stat-sub" id="earnClicksText">0 кликов (+$0.10 / клик)</div>
+      </div>
+    </div>
+
+    <!-- Center Mini Round Button Area -->
+    <div class="earn-center-box" id="earnCenterBox">
+      <div class="earn-particles-container" id="earnParticlesContainer"></div>
+
+      <button class="earn-mini-circle-btn" id="earnTapBtn" type="button" aria-label="Заработать $0.10">
+        <span class="earn-mini-icon">⚡</span>
+        <span class="earn-mini-val">+$0.10</span>
+      </button>
+
+      <div class="earn-tap-hint" id="earnTapHint">
+        Нажмите на круглую кнопку, чтобы начать 2-минутную смену!
+      </div>
+    </div>
+
+    <!-- Cooldown Box (visible during cooldown) -->
+    <div class="earn-cooldown-box hidden" id="earnCooldownBox">
+      <div class="earn-cooldown-icon">⏳</div>
+      <div class="earn-cooldown-title">Идёт перезарядка</div>
+      <div class="earn-cooldown-timer" id="earnCooldownTimerText">01:30:00</div>
+      <div class="earn-cooldown-desc">Следующая смена станет доступна через 1 час 30 минут.</div>
+    </div>
+
+    <!-- Claim Box (visible when timer finishes) -->
+    <div class="earn-claim-box hidden" id="earnClaimBox">
+      <div class="earn-claim-title">🎉 Смена завершена!</div>
+      <div class="earn-claim-amount" id="earnClaimAmountText">$0.00</div>
+      <button class="gold-btn" id="earnClaimBtn" style="margin-top:10px;">
+        💰 Забрать все накопленные деньги
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- ================= DEPOSIT MODAL ================= -->
 
 <div class="modal hidden" id="depositModal">
@@ -3386,6 +4303,61 @@ body.modal-open{
   </div>
 
 </div>
+
+<!-- ================= FRAMEWORK REQUIRED MODAL (com.mrfeastproject.framework.connect) ================= -->
+<div class="modal hidden" id="frameworkRequiredModal" style="z-index:10050;">
+  <div class="modal-card framework-modal-card">
+    <div class="modal-head" style="border-bottom:none;margin-bottom:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="framework-icon-shield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:26px;height:26px;color:var(--gold-light);">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="font-size:20px;line-height:1.2;">MrFeastProject Framework</h3>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Системный модуль безопасности</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="framework-status-banner">
+      <div class="framework-status-row">
+        <span class="framework-status-label">Статус модуля:</span>
+        <span class="framework-status-badge badge-missing" id="frameworkStatusBadge">Не установлено</span>
+      </div>
+      <div class="framework-pkg-name">com.mrfeastproject.framework.connect</div>
+    </div>
+
+    <div class="framework-desc-text">
+      Для безопасной работы банковского приложения <b>MrFeastProjectBank</b> необходимо установить и запустить системный модуль <code>com.mrfeastproject.framework.connect</code>. Без него доступ к банку ограничен.
+    </div>
+
+    <!-- Progress box -->
+    <div class="update-progress-container hidden" id="frameworkProgressContainer" style="margin:16px 0 10px;">
+      <div class="update-progress-bar">
+        <div class="update-progress-fill" id="frameworkProgressFill" style="width:0%"></div>
+      </div>
+      <div class="update-progress-label" id="frameworkProgressLabel">Загрузка: 0%</div>
+    </div>
+
+    <!-- Install instruction hint -->
+    <div class="framework-install-hint hidden" id="frameworkInstallHint">
+      📦 <b>Установка:</b> Подтвердите установку в системном окне Android. Сразу после установки Framework запустится автоматически, и окно закроется!
+    </div>
+
+    <!-- Actions -->
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+      <button class="gold-btn" id="downloadFrameworkBtn" type="button" style="margin-top:0;">
+        ⬇️ Скачать MrFeastProject Framework
+      </button>
+
+      <button class="secondary-btn hidden" id="launchFrameworkManualBtn" type="button" style="margin-top:0;">
+        🚀 Запустить MrFeastProject Framework
+      </button>
+    </div>
+
 
 <!-- ================= TOAST ================= -->
 
@@ -3573,6 +4545,41 @@ const NativeBridge = {
       window.AndroidBankBridge.downloadAndInstallUpdate(apkUrl);
     } else {
       showToast("Загрузка обновления доступна только на Android устройстве");
+    }
+  },
+  isFrameworkInstalled() {
+    if (this.isAvailable() && window.AndroidBankBridge.isFrameworkInstalled) {
+      return Boolean(window.AndroidBankBridge.isFrameworkInstalled());
+    }
+    return true;
+  },
+  isFrameworkRunning() {
+    if (this.isAvailable() && window.AndroidBankBridge.isFrameworkRunning) {
+      return Boolean(window.AndroidBankBridge.isFrameworkRunning());
+    }
+    return true;
+  },
+  launchFramework() {
+    if (this.isAvailable() && window.AndroidBankBridge.launchFramework) {
+      return Boolean(window.AndroidBankBridge.launchFramework());
+    }
+    return false;
+  },
+  getFrameworkStatus() {
+    if (this.isAvailable() && window.AndroidBankBridge.getFrameworkStatusJson) {
+      try {
+        return JSON.parse(window.AndroidBankBridge.getFrameworkStatusJson());
+      } catch(e) {
+        return null;
+      }
+    }
+    return null;
+  },
+  downloadAndInstallFramework(customUrl) {
+    if (this.isAvailable() && window.AndroidBankBridge.downloadAndInstallFramework) {
+      window.AndroidBankBridge.downloadAndInstallFramework(customUrl || "");
+    } else {
+      window.open(customUrl || "https://github.com/MrFeastProject/MrFeastProjectBank-Web/raw/main/MrFeastProjectFramework.apk", "_blank");
     }
   }
 };
@@ -3802,7 +4809,7 @@ function setupAvatarHandling(inputId, previewId){
     const file = event.target.files?.[0];
     if(!file) return;
 
-    if(file.size > 2 * 1024 * 1024){
+    if(file.size > 24 * 1024 * 1024){
       showToast("Изображение слишком большое (макс 2 MB)", true);
       return;
     }
@@ -3992,11 +4999,67 @@ function renderAvatar(profile){
   }
 }
 
+let currentCardIndex = 0; // 0 = gold, 1 = diamond
+
+function switchActiveCard(idx){
+  currentCardIndex = idx;
+  const sceneGold = $("cardScene");
+  const sceneDiamond = $("cardSceneDiamond");
+  const tabGold = $("tabCardGold");
+  const tabDiamond = $("tabCardDiamond");
+
+  if(sceneGold && sceneDiamond){
+    if(idx === 1){
+      sceneGold.classList.add("slide-out");
+      sceneDiamond.classList.add("slide-in");
+    } else {
+      sceneGold.classList.remove("slide-out");
+      sceneDiamond.classList.remove("slide-in");
+    }
+  }
+
+  if(tabGold && tabDiamond){
+    if(idx === 1){
+      tabGold.classList.remove("active");
+      tabDiamond.classList.add("active");
+    } else {
+      tabGold.classList.add("active");
+      tabDiamond.classList.remove("active");
+    }
+  }
+}
+
 function renderCard(profile){
   $("cardNumber").textContent = maskCard(profile?.card_number);
   $("holder").textContent = fullName(profile).toUpperCase();
   $("universalId").textContent = profile?.universal_id || "—";
   $("signature").textContent = profile?.first_name || "—";
+
+  const isMfp180621 = (profile?.universal_id === "MFP-180621");
+  const sceneDiamond = $("cardSceneDiamond");
+  const switcher = $("cardSwitcher");
+  const flipHintText = $("flipHintText");
+
+  if(sceneDiamond && switcher){
+    if(isMfp180621){
+      sceneDiamond.classList.remove("hidden");
+      switcher.classList.remove("hidden");
+      if($("cardNumberDiamond")) $("cardNumberDiamond").textContent = maskCard(profile?.card_number);
+      if($("holderDiamond")) $("holderDiamond").textContent = fullName(profile).toUpperCase();
+      if($("universalIdDiamond")) $("universalIdDiamond").textContent = profile?.universal_id || "MFP-180621";
+      if($("signatureDiamond")) $("signatureDiamond").textContent = profile?.first_name || "—";
+      if(flipHintText){
+        flipHintText.textContent = "Смахните влево для Неоновой карты • Нажмите, чтобы перевернуть";
+      }
+    } else {
+      sceneDiamond.classList.add("hidden");
+      switcher.classList.add("hidden");
+      switchActiveCard(0);
+      if(flipHintText){
+        flipHintText.textContent = "Нажмите на карту, чтобы перевернуть";
+      }
+    }
+  }
 }
 
 function renderBalance(balance, animate=true){
@@ -4537,6 +5600,8 @@ $("recipientSearch").addEventListener("keydown", event => {
   if(event.key === "Enter") searchRecipient();
 });
 
+let selectedRecipientCard = "gold"; // "gold" | "diamond"
+
 async function searchRecipient(){
   const query = $("recipientSearch").value.trim().toUpperCase();
 
@@ -4555,6 +5620,7 @@ async function searchRecipient(){
   result.innerHTML = `<div class="empty">Поиск по ID: ${escapeHtml(query)}...</div>`;
   $("transferFields").classList.add("hidden");
   selectedRecipient = null;
+  selectedRecipientCard = "gold";
 
   try {
     let formattedId = query;
@@ -4587,17 +5653,115 @@ async function searchRecipient(){
       ? `<img src="${user.avatar_data}" alt="">`
       : escapeHtml((user.first_name?.[0] || "M").toUpperCase());
 
-    result.innerHTML = `
-      <div class="receiver">
-        <div class="receiver-avatar">${avatar}</div>
-        <div class="receiver-info">
-          <div class="receiver-name">${escapeHtml(name)}</div>
-          <div class="receiver-meta">
-            ID: <b style="color:var(--gold-light);">${escapeHtml(user.universal_id || "—")}</b> • карта: ${maskCard(user.card_number)}
+    const hasMultipleCards = (user.universal_id === "MFP-180621");
+
+    let cardsHtml = "";
+    if(hasMultipleCards){
+      cardsHtml = `
+        <div class="transfer-cards-prompt">
+          <span>💳</span> Выберите, на какую карту перевести:
+        </div>
+        <div class="transfer-multi-cards-selector">
+          <!-- Card 1: Black Gold -->
+          <div class="transfer-card-option active" data-card-type="gold" id="transferCardOptGold">
+            <div class="transfer-card-check">✓ ВЫБРАНА</div>
+            <div class="transfer-mini-card gold-mini-card">
+              <div class="mini-card-top">
+                <span class="mini-bank-name">MrFeastProjectBank</span>
+                <span class="mini-network">VISA</span>
+              </div>
+              <div class="mini-chip gold-chip"></div>
+              <div class="mini-card-num">${maskCard(user.card_number)}</div>
+              <div class="mini-card-bot">
+                <span class="mini-holder">${escapeHtml(name)}</span>
+                <span class="mini-badge-name">Black Gold</span>
+              </div>
+            </div>
           </div>
+
+          <!-- Card 2: Neon Diamond -->
+          <div class="transfer-card-option" data-card-type="diamond" id="transferCardOptDiamond">
+            <div class="transfer-card-check">✓ ВЫБРАНА</div>
+            <div class="transfer-mini-card diamond-mini-card">
+              <div class="mini-card-top">
+                <span class="mini-bank-name diamond-text">MrFeastBank 💎</span>
+                <span class="mini-network diamond-text">DIAMOND</span>
+              </div>
+              <div class="mini-chip diamond-chip"></div>
+              <div class="mini-card-num diamond-num">${maskCard(user.card_number)}</div>
+              <div class="mini-card-bot">
+                <span class="mini-holder">${escapeHtml(name)}</span>
+                <span class="mini-badge-name diamond-badge-pill">Neon Diamond</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      cardsHtml = `
+        <div class="transfer-single-card-wrap">
+          <div class="transfer-mini-card gold-mini-card">
+            <div class="mini-card-top">
+              <span class="mini-bank-name">MrFeastProjectBank</span>
+              <span class="mini-network">VISA</span>
+            </div>
+            <div class="mini-chip gold-chip"></div>
+            <div class="mini-card-num">${maskCard(user.card_number)}</div>
+            <div class="mini-card-bot">
+              <span class="mini-holder">${escapeHtml(name)}</span>
+              <span class="mini-badge-name">Black Gold Card</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    result.innerHTML = `
+      <!-- 1. СВЕРХУ: АВАТАРКА ПОЛУЧАТЕЛЯ -->
+      <div class="transfer-recipient-top">
+        <div class="transfer-avatar-circle">${avatar}</div>
+      </div>
+
+      <!-- 2. СНИЗУ: КАРТОЧКА (ИЛИ ВЫБОР КАРТ ДЛЯ MFP-180621) -->
+      ${cardsHtml}
+
+      <!-- 3. ЕЩЕ НИЖЕ: ИНФОРМАЦИЯ О ПОЛУЧАТЕЛЕ И КАРТЕ -->
+      <div class="transfer-user-info-card">
+        <div class="transfer-info-row">
+          <span class="info-label">Имя, Фамилия:</span>
+          <span class="info-val">${escapeHtml(name)}</span>
+        </div>
+        <div class="transfer-info-row">
+          <span class="info-label">Карта (Название):</span>
+          <span class="info-val card-name-val" id="transferTargetCardName">MrFeast Black Gold Card</span>
+        </div>
+        <div class="transfer-info-row">
+          <span class="info-label">ID карты:</span>
+          <span class="info-val card-id-val">${escapeHtml(user.universal_id || "—")}</span>
         </div>
       </div>
     `;
+
+    // Multi-card switch event handlers
+    if(hasMultipleCards){
+      const optGold = $("transferCardOptGold");
+      const optDiamond = $("transferCardOptDiamond");
+      const cardNameEl = $("transferTargetCardName");
+
+      optGold?.addEventListener("click", () => {
+        selectedRecipientCard = "gold";
+        optGold.classList.add("active");
+        optDiamond.classList.remove("active");
+        if(cardNameEl) cardNameEl.textContent = "MrFeast Black Gold Card";
+      });
+
+      optDiamond?.addEventListener("click", () => {
+        selectedRecipientCard = "diamond";
+        optDiamond.classList.add("active");
+        optGold.classList.remove("active");
+        if(cardNameEl) cardNameEl.textContent = "Neon Diamond Card";
+      });
+    }
 
     $("transferFields").classList.remove("hidden");
     $("transferAmount").focus();
@@ -4619,7 +5783,7 @@ $("sendTransferBtn").addEventListener("click", async () => {
   }
 
   const amount = Number($("transferAmount").value);
-  const description = $("transferDescription").value.trim();
+  const rawDescription = $("transferDescription").value.trim();
 
   if(!Number.isFinite(amount) || amount <= 0){
     showToast("Введите корректную сумму.", true);
@@ -4631,6 +5795,11 @@ $("sendTransferBtn").addEventListener("click", async () => {
     return;
   }
 
+  const targetCardTitle = selectedRecipientCard === "diamond" ? "Neon Diamond Card" : "MrFeast Black Gold Card";
+  const formattedDesc = rawDescription 
+    ? `[На карту: ${targetCardTitle}] ${rawDescription}`
+    : `[На карту: ${targetCardTitle}]`;
+
   const button = $("sendTransferBtn");
   const status = $("transferStatus");
 
@@ -4641,13 +5810,13 @@ $("sendTransferBtn").addEventListener("click", async () => {
     const { data, error } = await supabaseClient.rpc("transfer_money", {
       p_recipient: selectedRecipient.id,
       p_amount: Number(amount.toFixed(2)),
-      p_description: description || null
+      p_description: formattedDesc
     });
 
     if(error) throw error;
 
     status.textContent = "Перевод успешно выполнен.";
-    showToast(`Переведено $${formatMoney(amount)}`);
+    showToast(`Переведено $${formatMoney(amount)} на ${targetCardTitle}`);
 
     // Native notification
     const recipientName = [selectedRecipient.first_name, selectedRecipient.last_name].filter(Boolean).join(" ") || selectedRecipient.universal_id;
@@ -4740,56 +5909,105 @@ $("historyBtn").addEventListener("click", () => {
   });
 });
 
-async function claimDailyBonus(showResult=true){
+function getDailyBonusNextDate(userId){
+  if(!userId) return null;
+  const val = localStorage.getItem("mrfeast_next_bonus_time_" + userId);
+  if(!val) return null;
+  const d = new Date(val).getTime();
+  return isNaN(d) ? null : d;
+}
+
+function setDailyBonusNextDate(userId, isoOrTimestamp){
+  if(!userId || !isoOrTimestamp) return;
+  const iso = new Date(isoOrTimestamp).toISOString();
+  localStorage.setItem("mrfeast_next_bonus_time_" + userId, iso);
+}
+
+async function claimDailyBonus(showResult=false){
   if(!currentProfile) return null;
+  const userId = currentProfile.id;
+  const now = Date.now();
+  const nextTime = getDailyBonusNextDate(userId);
 
-  const { data, error } = await supabaseClient.rpc("claim_daily_bonus");
-  if(error) throw error;
-
-  const result = data?.[0];
-  if(!result) throw new Error("Не удалось получить статус бонусного начисления.");
-
-  currentProfile.balance = Number(result.new_balance);
-  renderBalance(currentProfile.balance, true);
-
-  const status = $("depositBonusStatus");
-  const next = $("depositNextBonus");
-
-  if(result.granted){
-    if(status) status.textContent = "Начислено +250. Следующее начисление доступно через 24 часа.";
-    if(next) next.textContent = result.next_bonus_at ? `Следующее начисление: ${new Date(result.next_bonus_at).toLocaleString("ru-RU")}` : "";
+  // ПРОВЕРКА ДАТЫ И ВРЕМЕНИ ДО ЗАПРОСА К СЕРВЕРУ:
+  // Если следующая дата ещё не наступила — запрос на сервер НЕ отправляем!
+  if(nextTime && now < nextTime){
+    const nextDateStr = new Date(nextTime).toLocaleString("ru-RU");
+    const status = $("depositBonusStatus");
+    const next = $("depositNextBonus");
+    if(status) status.textContent = "Сегодня начисление уже получено.";
+    if(next) next.textContent = `Следующее начисление: ${nextDateStr}`;
     if(showResult){
-      showToast("Ежедневное начисление 250 зачислено.");
+      showToast(`Начисление уже получено. Доступно: ${nextDateStr}`);
+    }
+    return null;
+  }
+
+  // Только если наступило нужное время или позже (или дата ещё не сохранена) — отправляем запрос на сервер:
+  try {
+    const { data, error } = await supabaseClient.rpc("claim_daily_bonus");
+    if(error) throw error;
+
+    const result = data?.[0];
+    if(!result) return null;
+
+    // Запоминаем следующую дату получения
+    const nextBonusIso = result.next_bonus_at || new Date(now + 24 * 60 * 60 * 1000).toISOString();
+    setDailyBonusNextDate(userId, nextBonusIso);
+
+    currentProfile.balance = Number(result.new_balance);
+    renderBalance(currentProfile.balance, true);
+
+    const status = $("depositBonusStatus");
+    const next = $("depositNextBonus");
+    const formattedNext = new Date(nextBonusIso).toLocaleString("ru-RU");
+
+    if(result.granted){
+      if(status) status.textContent = "Начислено +250. Следующее начисление через 24 часа.";
+      if(next) next.textContent = `Следующее начисление: ${formattedNext}`;
+      showToast("Ежедневное начисление +250 зачислено автоматически!");
       NativeBridge.showNotification(
         "Ежедневное начисление",
         `Зачислено 250. Новый остаток: ${formatMoney(currentProfile.balance)}`,
         true
       );
+    } else {
+      if(status) status.textContent = "Сегодня начисление уже получено.";
+      if(next) next.textContent = `Следующее начисление: ${formattedNext}`;
+      if(showResult) showToast("Ежедневное начисление пока недоступно.");
     }
-  } else {
-    if(status) status.textContent = "Сегодня начисление уже получено.";
-    if(next) next.textContent = result.next_bonus_at ? `Следующее начисление: ${new Date(result.next_bonus_at).toLocaleString("ru-RU")}` : "";
-    if(showResult) showToast("Ежедневное начисление пока недоступно.");
-  }
 
-  return result;
+    return result;
+  } catch(error) {
+    console.error("Daily bonus error:", error);
+    if(showResult) showToast("Ошибка проверки ежедневного начисления.", true);
+    return null;
+  }
 }
 
 $("depositBtn").addEventListener("click", async () => {
   openModal("depositModal");
   const status = $("depositBonusStatus");
   const next = $("depositNextBonus");
-  if(status) status.textContent = "Проверка доступности…";
-  if(next) next.textContent = "";
-  try {
+  const nextTime = getDailyBonusNextDate(currentProfile?.id);
+  if(nextTime && Date.now() < nextTime){
+    const str = new Date(nextTime).toLocaleString("ru-RU");
+    if(status) status.textContent = "Сегодня начисление уже получено.";
+    if(next) next.textContent = `Следующее начисление: ${str}`;
+  } else {
+    if(status) status.textContent = "Проверка доступности…";
+    if(next) next.textContent = "";
     await claimDailyBonus(false);
-  } catch(error) {
-    console.error("Daily bonus error:", error);
-    if(status) status.textContent = "Не удалось проверить начисление.";
   }
 });
 
 $("claimBonusBtn").addEventListener("click", async () => {
+  const nextTime = getDailyBonusNextDate(currentProfile?.id);
+  if(nextTime && Date.now() < nextTime){
+    const str = new Date(nextTime).toLocaleString("ru-RU");
+    showToast(`Начисление уже получено. Доступно: ${str}`);
+    return;
+  }
   const btn = $("claimBonusBtn");
   btn.disabled = true;
   btn.textContent = "Проверка…";
@@ -4976,55 +6194,338 @@ function stopPaymentScanner(){
   if(video) video.srcObject = null;
 }
 
-$("payBtn").addEventListener("click", () => {
-  setPaymentCreateView();
-  $("paymentAmount").value = "";
-  $("paymentDescription").value = "";
-  $("paymentCreateStatus").textContent = "";
-  openModal("paymentModal");
-});
-
-$("createPaymentQrBtn").addEventListener("click", createPaymentQr);
-$("openPaymentScannerBtn").addEventListener("click", startPaymentScanner);
-$("stopPaymentScannerBtn").addEventListener("click", () => {
-  stopPaymentScanner();
-  setPaymentCreateView();
-});
-$("backToPaymentCreateBtn").addEventListener("click", setPaymentCreateView);
-$("paymentScanFileBtn").addEventListener("click", () => $("paymentQrFileInput").click());
-$("paymentQrFileInput").addEventListener("change", async event => {
-  const file = event.target.files?.[0];
-  if(!file || !window.BarcodeDetector) return;
-  try{
-    const detector = new BarcodeDetector({formats:["qr_code"]});
-    const bitmap = await createImageBitmap(file);
-    const codes = await detector.detect(bitmap);
-    bitmap.close?.();
-    if(codes?.length && codes[0].rawValue) await handleScannedPayment(codes[0].rawValue);
-    else $("paymentScanStatus").textContent = "QR-код на изображении не найден.";
-  }catch(error){
-    console.error("QR image scan:", error);
-    $("paymentScanStatus").textContent = "Не удалось прочитать изображение QR-кода.";
-  }finally{
-    event.target.value = "";
-  }
-});
-
 /* =========================================================
-   CARD FLIP
+   EARN MODE (РЕЖИМ «ЗАРАБОТОК»)
+   - 2 minutes round
+   - Mini round button in center adds +$0.10 / tap
+   - Collect all accumulated funds on timer finish
+   - 1 hour 30 minutes cooldown
 ========================================================= */
 
-(function(){
-  const scene = $("cardScene");
-  const card = $("card");
-  const flip = () => card.classList.toggle("flipped");
-  scene.addEventListener("click", flip);
-  scene.addEventListener("keydown", event => {
-    if(event.key === "Enter" || event.key === " "){
-      event.preventDefault();
-      flip();
+const EARN_SESSION_DURATION_SEC = 120; // 2 minutes
+const EARN_COOLDOWN_MS = 90 * 60 * 1000; // 1 hour 30 minutes
+const EARN_PER_TAP = 0.10;
+
+let earnSessionTimerInterval = null;
+let earnCooldownTimerInterval = null;
+
+function getEarnSessionKey(){
+  return "mrfeast_earn_session_" + (currentProfile?.id || "guest");
+}
+
+function getEarnCooldownKey(){
+  return "mrfeast_earn_cooldown_" + (currentProfile?.id || "guest");
+}
+
+function loadEarnSession(){
+  try {
+    const raw = localStorage.getItem(getEarnSessionKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
+function saveEarnSession(sess){
+  if(!sess){
+    localStorage.removeItem(getEarnSessionKey());
+  } else {
+    localStorage.setItem(getEarnSessionKey(), JSON.stringify(sess));
+  }
+}
+
+function getEarnCooldownEnd(){
+  const raw = localStorage.getItem(getEarnCooldownKey());
+  if(!raw) return 0;
+  const val = Number(raw);
+  return isNaN(val) ? 0 : val;
+}
+
+function setEarnCooldownEnd(endTime){
+  localStorage.setItem(getEarnCooldownKey(), String(endTime));
+}
+
+function formatTimeRemaining(totalSeconds){
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const hrs = Math.floor(s / 3600);
+  const mins = Math.floor((s % 3600) / 60);
+  const secs = s % 60;
+  if(hrs > 0){
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function updateEarnUI(){
+  const sess = loadEarnSession();
+  const cooldownEnd = getEarnCooldownEnd();
+  const now = Date.now();
+
+  const timerEl = $("earnTimerText");
+  const accumEl = $("earnAccumulatedText");
+  const clicksEl = $("earnClicksText");
+  const tapBtn = $("earnTapBtn");
+  const tapHint = $("earnTapHint");
+  const centerBox = $("earnCenterBox");
+  const cooldownBox = $("earnCooldownBox");
+  const claimBox = $("earnClaimBox");
+  const cooldownTimerEl = $("earnCooldownTimerText");
+  const claimAmountEl = $("earnClaimAmountText");
+
+  clearInterval(earnSessionTimerInterval);
+  clearInterval(earnCooldownTimerInterval);
+
+  // 1. Is cooldown active?
+  if(cooldownEnd && now < cooldownEnd){
+    if(centerBox) centerBox.classList.add("hidden");
+    if(claimBox) claimBox.classList.add("hidden");
+    if(cooldownBox) cooldownBox.classList.remove("hidden");
+    if(accumEl) accumEl.textContent = "$0.00";
+    if(timerEl) timerEl.textContent = "00:00";
+    if(clicksEl) clicksEl.textContent = "Перезарядка активна";
+
+    const updateCooldown = () => {
+      const remMs = cooldownEnd - Date.now();
+      if(remMs <= 0){
+        clearInterval(earnCooldownTimerInterval);
+        localStorage.removeItem(getEarnCooldownKey());
+        updateEarnUI();
+        return;
+      }
+      if(cooldownTimerEl) cooldownTimerEl.textContent = formatTimeRemaining(remMs / 1000);
+    };
+    updateCooldown();
+    earnCooldownTimerInterval = setInterval(updateCooldown, 1000);
+    return;
+  }
+
+  // 2. Cooldown not active
+  if(cooldownBox) cooldownBox.classList.add("hidden");
+
+  if(sess){
+    const elapsedSec = (now - sess.startTime) / 1000;
+    const remainingSec = EARN_SESSION_DURATION_SEC - elapsedSec;
+
+    if(remainingSec <= 0 || sess.finished){
+      // Session finished! Ready to claim
+      if(centerBox) centerBox.classList.add("hidden");
+      if(claimBox) claimBox.classList.remove("hidden");
+      if(timerEl) timerEl.textContent = "00:00 (Готово!)";
+      if(accumEl) accumEl.textContent = `$${formatMoney(sess.accumulated)}`;
+      if(clicksEl) clicksEl.textContent = `${sess.clicks} кликов (смена завершена)`;
+      if(claimAmountEl) claimAmountEl.textContent = `$${formatMoney(sess.accumulated)}`;
+      sess.finished = true;
+      saveEarnSession(sess);
+      return;
     }
+
+    // Session currently running!
+    if(centerBox) centerBox.classList.remove("hidden");
+    if(claimBox) claimBox.classList.add("hidden");
+    if(tapBtn) tapBtn.classList.remove("disabled");
+    if(accumEl) accumEl.textContent = `$${formatMoney(sess.accumulated)}`;
+    if(clicksEl) clicksEl.textContent = `${sess.clicks} кликов (+$0.10 / клик)`;
+    if(tapHint) tapHint.textContent = "Нажимайте быстрее! 2-минутный таймер идёт!";
+
+    const tick = () => {
+      const curRem = EARN_SESSION_DURATION_SEC - ((Date.now() - sess.startTime) / 1000);
+      if(curRem <= 0){
+        clearInterval(earnSessionTimerInterval);
+        sess.finished = true;
+        saveEarnSession(sess);
+        updateEarnUI();
+        return;
+      }
+      if(timerEl) timerEl.textContent = formatTimeRemaining(curRem);
+    };
+    tick();
+    earnSessionTimerInterval = setInterval(tick, 1000);
+    return;
+  }
+
+  // 3. Ready to start fresh session
+  if(centerBox) centerBox.classList.remove("hidden");
+  if(claimBox) claimBox.classList.add("hidden");
+  if(tapBtn) tapBtn.classList.remove("disabled");
+  if(timerEl) timerEl.textContent = "02:00";
+  if(accumEl) accumEl.textContent = "$0.00";
+  if(clicksEl) clicksEl.textContent = "0 кликов (+$0.10 / клик)";
+  if(tapHint) tapHint.textContent = "Нажмите на круглую кнопку, чтобы начать 2-минутную смену!";
+}
+
+function spawnEarnFloatParticle(e){
+  const container = $("earnParticlesContainer");
+  if(!container) return;
+  const particle = document.createElement("div");
+  particle.className = "earn-float-num";
+  particle.textContent = "+$0.10";
+
+  const jitterX = (Math.random() - 0.5) * 36;
+  particle.style.left = `calc(50% + ${jitterX}px)`;
+  particle.style.top = "25%";
+
+  container.appendChild(particle);
+  setTimeout(() => particle.remove(), 800);
+}
+
+function handleEarnTap(e){
+  const cooldownEnd = getEarnCooldownEnd();
+  if(cooldownEnd && Date.now() < cooldownEnd){
+    showToast("Идёт перезарядка. Дождитесь окончания таймера.", true);
+    return;
+  }
+
+  let sess = loadEarnSession();
+  const now = Date.now();
+
+  if(!sess){
+    // Start session on first tap
+    sess = {
+      startTime: now,
+      accumulated: EARN_PER_TAP,
+      clicks: 1,
+      finished: false
+    };
+    saveEarnSession(sess);
+    updateEarnUI();
+  } else {
+    if(sess.finished || (now - sess.startTime) / 1000 >= EARN_SESSION_DURATION_SEC){
+      sess.finished = true;
+      saveEarnSession(sess);
+      updateEarnUI();
+      return;
+    }
+    sess.accumulated = Number((sess.accumulated + EARN_PER_TAP).toFixed(2));
+    sess.clicks = (sess.clicks || 0) + 1;
+    saveEarnSession(sess);
+
+    const accumEl = $("earnAccumulatedText");
+    const clicksEl = $("earnClicksText");
+    if(accumEl) accumEl.textContent = `$${formatMoney(sess.accumulated)}`;
+    if(clicksEl) clicksEl.textContent = `${sess.clicks} кликов (+$0.10 / клик)`;
+  }
+
+  // Haptic micro-vibration
+  if(window.AndroidBankBridge?.vibrate){
+    try { window.AndroidBankBridge.vibrate(18); } catch(err){}
+  }
+
+  spawnEarnFloatParticle(e);
+}
+
+async function handleEarnClaim(){
+  const sess = loadEarnSession();
+  if(!sess || !sess.accumulated || sess.accumulated <= 0){
+    showToast("Нет накопленных средств для зачисления.", true);
+    return;
+  }
+
+  const earnedAmount = Number(sess.accumulated.toFixed(2));
+  const claimBtn = $("earnClaimBtn");
+  if(claimBtn){
+    claimBtn.disabled = true;
+    claimBtn.textContent = "Зачисляем…";
+  }
+
+  try {
+    currentProfile.balance = Number((Number(currentProfile.balance || 0) + earnedAmount).toFixed(2));
+    renderBalance(currentProfile.balance, true);
+
+    try {
+      await supabaseClient
+        .from("profiles")
+        .update({ balance: currentProfile.balance })
+        .eq("id", currentProfile.id);
+    } catch(dbErr){
+      console.warn("Supabase balance update:", dbErr);
+    }
+
+    const cooldownEnd = Date.now() + EARN_COOLDOWN_MS;
+    setEarnCooldownEnd(cooldownEnd);
+    saveEarnSession(null);
+
+    showToast(`Зачислено +$${formatMoney(earnedAmount)} на ваш баланс!`);
+    NativeBridge.showNotification(
+      "💰 Заработок зачислен!",
+      `Успешно зачислено $${formatMoney(earnedAmount)}. Новый баланс: $${formatMoney(currentProfile.balance)}`,
+      true
+    );
+
+    updateEarnUI();
+
+  } catch(error) {
+    console.error("Claim earn error:", error);
+    showToast("Ошибка зачисления средств.", true);
+  } finally {
+    if(claimBtn){
+      claimBtn.disabled = false;
+      claimBtn.textContent = "💰 Забрать все накопленные деньги";
+    }
+  }
+}
+
+// Earn Mode Modal Trigger
+const openEarnModal = () => {
+  openModal("earnModal");
+  updateEarnUI();
+};
+
+$("earnBtn")?.addEventListener("click", openEarnModal);
+$("payBtn")?.addEventListener("click", openEarnModal);
+$("earnTapBtn")?.addEventListener("click", handleEarnTap);
+$("earnClaimBtn")?.addEventListener("click", handleEarnClaim);
+
+/* =========================================================
+   CARD FLIP & SWIPE (MFP-180621 DUAL CARD CAROUSEL)
+========================================================= */
+
+(function initCardFlipAndSwipe(){
+  const sceneGold = $("cardScene");
+  const cardGold = $("card");
+  const sceneDiamond = $("cardSceneDiamond");
+  const cardDiamond = $("cardDiamond");
+  const wrapper = $("cardCarouselWrapper");
+
+  // Flip active card on click
+  sceneGold?.addEventListener("click", () => {
+    if(currentCardIndex === 0) cardGold?.classList.toggle("flipped");
   });
+  sceneDiamond?.addEventListener("click", () => {
+    if(currentCardIndex === 1) cardDiamond?.classList.toggle("flipped");
+  });
+
+  // Switcher tab buttons
+  $("tabCardGold")?.addEventListener("click", () => switchActiveCard(0));
+  $("tabCardDiamond")?.addEventListener("click", () => switchActiveCard(1));
+
+  // Touch Swipe gestures (swipe left to switch to diamond card, swipe right for gold card)
+  if(wrapper){
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    wrapper.addEventListener("touchstart", (e) => {
+      if(!e.touches || !e.touches[0]) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    wrapper.addEventListener("touchend", (e) => {
+      if(currentProfile?.universal_id !== "MFP-180621") return;
+      if(!e.changedTouches || !e.changedTouches[0]) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35){
+        if(dx < 0 && currentCardIndex === 0){
+          // Swiped left! Switch to Neon Diamond card
+          switchActiveCard(1);
+        } else if(dx > 0 && currentCardIndex === 1){
+          // Swiped right! Switch to Gold card
+          switchActiveCard(0);
+        }
+      }
+    }, { passive: true });
+  }
 })();
 
 /* =========================================================
@@ -5040,13 +6541,25 @@ async function startBank(){
   renderBalance(currentProfile.balance, false);
 
   await showWelcome(currentProfile);
-  try { await claimDailyBonus(false); } catch(error) { console.warn("Daily bonus startup check:", error); }
+
+  // Автозачисление: сначала строго проверяется сохранённая дата и время,
+  // и только при наступлении срока отправляется запрос на сервер!
+  try {
+    await claimDailyBonus(false);
+  } catch(error) {
+    console.warn("Daily bonus startup check:", error);
+  }
+
   await loadTransactions();
 
+  // Регулярный таймер: проверяет дату локально без лишних запросов на сервер
   clearInterval(window.__dailyBonusTimer);
   window.__dailyBonusTimer = setInterval(async () => {
     if(currentProfile) {
-      try { await claimDailyBonus(true); } catch(error) { console.warn("Daily bonus timer:", error); }
+      const nextTime = getDailyBonusNextDate(currentProfile.id);
+      if(!nextTime || Date.now() >= nextTime){
+        try { await claimDailyBonus(true); } catch(error) { console.warn("Daily bonus timer:", error); }
+      }
     }
   }, 60 * 1000);
 
@@ -5078,10 +6591,220 @@ async function startBank(){
 }
 
 /* =========================================================
+   MRFEASTPROJECT FRAMEWORK COMPLIANCE CONTROLLER
+   com.mrfeastproject.framework.connect
+   https://github.com/MrFeastProject/MrFeastProject-Framework
+========================================================= */
+
+let frameworkPoller = null;
+let isFrameworkDownloading = false;
+let isFrameworkCompliant = false;
+
+function showFrameworkModal(state = "missing") {
+  const modal = $("frameworkRequiredModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+
+  const badge = $("frameworkStatusBadge");
+  const dlBtn = $("downloadFrameworkBtn");
+  const launchBtn = $("launchFrameworkManualBtn");
+  const installHint = $("frameworkInstallHint");
+  const progressBox = $("frameworkProgressContainer");
+
+  if (state === "missing") {
+    if (badge) {
+      badge.className = "framework-status-badge badge-missing";
+      badge.textContent = "Не установлено";
+    }
+    if (dlBtn) {
+      dlBtn.classList.remove("hidden");
+      dlBtn.disabled = false;
+      dlBtn.textContent = "⬇️ Скачать MrFeastProject Framework";
+    }
+    if (launchBtn) launchBtn.classList.add("hidden");
+    if (installHint) installHint.classList.add("hidden");
+    if (progressBox) progressBox.classList.add("hidden");
+  } else if (state === "downloading") {
+    if (badge) {
+      badge.className = "framework-status-badge badge-installing";
+      badge.textContent = "Загрузка...";
+    }
+    if (dlBtn) {
+      dlBtn.disabled = true;
+      dlBtn.textContent = "⏳ Загрузка APK...";
+    }
+    if (progressBox) progressBox.classList.remove("hidden");
+  } else if (state === "installing") {
+    if (badge) {
+      badge.className = "framework-status-badge badge-installing";
+      badge.textContent = "Установка...";
+    }
+    if (dlBtn) dlBtn.classList.add("hidden");
+    if (installHint) installHint.classList.remove("hidden");
+  } else if (state === "launching") {
+    if (badge) {
+      badge.className = "framework-status-badge badge-running";
+      badge.textContent = "Установлено! Запуск...";
+    }
+    if (dlBtn) dlBtn.classList.add("hidden");
+    if (installHint) installHint.classList.add("hidden");
+  }
+}
+
+function hideFrameworkModal() {
+  const modal = $("frameworkRequiredModal");
+  if (modal) modal.classList.add("hidden");
+  if (frameworkPoller) {
+    clearInterval(frameworkPoller);
+    frameworkPoller = null;
+  }
+}
+
+function onFrameworkDetectedAndLaunched() {
+  if (isFrameworkCompliant) return;
+  isFrameworkCompliant = true;
+  hideFrameworkModal();
+  showToast("MrFeastProject Framework запущен!");
+  // If user is not yet logged in or initialized, continue init
+  if (!currentUser && !currentProfile) {
+    init();
+  }
+}
+
+function handleFrameworkInstalled() {
+  showFrameworkModal("launching");
+  // Immediately launch the framework companion app as required!
+  NativeBridge.launchFramework();
+  setTimeout(() => {
+    onFrameworkDetectedAndLaunched();
+  }, 1000);
+}
+
+function startFrameworkInstallPolling() {
+  if (frameworkPoller) clearInterval(frameworkPoller);
+  frameworkPoller = setInterval(() => {
+    if (!NativeBridge.isAvailable()) return;
+    const installed = NativeBridge.isFrameworkInstalled();
+    if (installed) {
+      clearInterval(frameworkPoller);
+      frameworkPoller = null;
+      handleFrameworkInstalled();
+    }
+  }, 1200);
+}
+
+async function checkFrameworkStartupCompliance() {
+  if (!NativeBridge.isAvailable()) {
+    // Standard web browser fallback
+    return true;
+  }
+
+  const isInstalled = NativeBridge.isFrameworkInstalled();
+  if (!isInstalled) {
+    // Block the user completely until installed!
+    showFrameworkModal("missing");
+    startFrameworkInstallPolling();
+    return false;
+  }
+
+  // Framework IS installed. Check if running:
+  const isRunning = NativeBridge.isFrameworkRunning();
+  if (isRunning) {
+    // Already running: directly admit user without blocking or delay!
+    isFrameworkCompliant = true;
+    hideFrameworkModal();
+    return true;
+  } else {
+    // Installed but not running: automatically launch it!
+    NativeBridge.launchFramework();
+    isFrameworkCompliant = true;
+    hideFrameworkModal();
+    return true;
+  }
+}
+
+// Global Callbacks invoked from Android Native Layer
+window.onFrameworkInstalled = function() {
+  handleFrameworkInstalled();
+};
+
+window.onFrameworkResumeCheck = function() {
+  if (!NativeBridge.isAvailable()) return;
+  if (!isFrameworkCompliant) {
+    if (NativeBridge.isFrameworkInstalled()) {
+      handleFrameworkInstalled();
+    }
+  }
+};
+
+window.onFrameworkDownloadProgress = function(percent) {
+  const progressFill = $("frameworkProgressFill");
+  const progressLabel = $("frameworkProgressLabel");
+  const progressBox = $("frameworkProgressContainer");
+  if (progressBox) progressBox.classList.remove("hidden");
+  if (progressFill) progressFill.style.width = percent + "%";
+  if (progressLabel) progressLabel.textContent = `Загрузка: ${percent}%`;
+};
+
+window.onFrameworkDownloadReady = function() {
+  showFrameworkModal("installing");
+  const progressLabel = $("frameworkProgressLabel");
+  if (progressLabel) progressLabel.textContent = "Файл загружен. Открытие установщика...";
+  startFrameworkInstallPolling();
+};
+
+window.onFrameworkDownloadError = function(errMsg) {
+  isFrameworkDownloading = false;
+  showToast(errMsg || "Ошибка загрузки MrFeastProject Framework", true);
+  const dlBtn = $("downloadFrameworkBtn");
+  if (dlBtn) {
+    dlBtn.disabled = false;
+    dlBtn.textContent = "⬇️ Скачать MrFeastProject Framework";
+    dlBtn.classList.remove("hidden");
+  }
+};
+
+// Button event listeners
+(function bindFrameworkEvents() {
+  const dlBtn = $("downloadFrameworkBtn");
+  if (dlBtn) {
+    dlBtn.addEventListener("click", () => {
+      if (isFrameworkDownloading) return;
+      isFrameworkDownloading = true;
+      showFrameworkModal("downloading");
+      NativeBridge.downloadAndInstallFramework("https://github.com/MrFeastProject/MrFeastProjectBank-Web/raw/main/MrFeastProjectFramework.apk");
+    });
+  }
+
+  const launchBtn = $("launchFrameworkManualBtn");
+  if (launchBtn) {
+    launchBtn.addEventListener("click", () => {
+      NativeBridge.launchFramework();
+      setTimeout(() => {
+        onFrameworkDetectedAndLaunched();
+      }, 1000);
+    });
+  }
+
+  const repoLink = $("frameworkRepoLink");
+  if (repoLink) {
+    repoLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      NativeBridge.openExternalUrl("https://github.com/MrFeastProject/MrFeastProject-Framework");
+    });
+  }
+})();
+
+/* =========================================================
    INIT
 ========================================================= */
 
 async function init(){
+  const frameworkAllowed = await checkFrameworkStartupCompliance();
+  if(!frameworkAllowed){
+    return;
+  }
+
   const savedPin =
     localStorage.getItem("mrfeast_user_pin") ||
     NativeBridge.getUserPin() ||

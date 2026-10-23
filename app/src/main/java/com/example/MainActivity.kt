@@ -37,14 +37,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import com.example.bridge.AndroidBankBridge
 import com.example.service.MrFeastBankForegroundService
 import com.example.ui.theme.MyApplicationTheme
+import com.example.util.FrameworkManager
 import com.example.util.NotificationHelper
 
 class MainActivity : ComponentActivity() {
 
     private var activeWebView: WebView? = null
+    private var isPackageReceiverRegistered = false
+
+    private val packageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val pkg = intent?.data?.schemeSpecificPart
+            if (pkg == FrameworkManager.PACKAGE_NAME) {
+                // Instantly launch framework companion app as requested
+                FrameworkManager.launch(this@MainActivity)
+                activeWebView?.post {
+                    activeWebView?.evaluateJavascript(
+                        "if(window.onFrameworkInstalled) { window.onFrameworkInstalled(); }",
+                        null
+                    )
+                }
+            }
+        }
+    }
 
     companion object {
         var currentInstance: MainActivity? = null
@@ -80,6 +102,27 @@ class MainActivity : ComponentActivity() {
         // Ensure background monitoring service starts
         MrFeastBankForegroundService.startService(this)
 
+        // Register package installation receiver to detect com.mrfeastproject.framework.connect immediately
+        try {
+            val filter = IntentFilter(Intent.ACTION_PACKAGE_ADDED).apply {
+                addDataScheme("package")
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(packageReceiver, filter, Context.RECEIVER_EXPORTED)
+            } else {
+                registerReceiver(packageReceiver, filter)
+            }
+            isPackageReceiverRegistered = true
+        } catch (e: Exception) {
+            try {
+                val fallbackFilter = IntentFilter(Intent.ACTION_PACKAGE_ADDED).apply {
+                    addDataScheme("package")
+                }
+                registerReceiver(packageReceiver, fallbackFilter)
+                isPackageReceiverRegistered = true
+            } catch (_: Exception) {}
+        }
+
         setContent {
             MyApplicationTheme {
                 BankAppScreen(
@@ -104,9 +147,20 @@ class MainActivity : ComponentActivity() {
             "if(window.onInstallPermissionChanged) { window.onInstallPermissionChanged(); }",
             null
         )
+        // Check framework state on resume
+        activeWebView?.evaluateJavascript(
+            "if(window.onFrameworkResumeCheck) { window.onFrameworkResumeCheck(); }",
+            null
+        )
     }
 
     override fun onDestroy() {
+        if (isPackageReceiverRegistered) {
+            try {
+                unregisterReceiver(packageReceiver)
+            } catch (_: Exception) {}
+            isPackageReceiverRegistered = false
+        }
         if (currentInstance == this) {
             currentInstance = null
         }

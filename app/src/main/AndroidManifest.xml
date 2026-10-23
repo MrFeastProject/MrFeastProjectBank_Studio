@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- Package Visibility Queries for App Installer -->
+    <!-- Package Visibility Queries for App Installer and Framework -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -21,6 +21,7 @@
         </intent>
         <package android:name="com.google.android.packageinstaller" />
         <package android:name="com.android.packageinstaller" />
+        <package android:name="com.mrfeastproject.framework.connect" />
     </queries>
 
     <!-- Features for 2D Hardware Graphics Acceleration and Vulkan -->
